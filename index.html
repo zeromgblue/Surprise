@@ -281,8 +281,16 @@
                 `;
                 heroDashBtn.style.display = 'none';
                 document.getElementById('google-login-btn').addEventListener('click', async () => {
-                    try { await signInWithPopup(auth, googleProvider); }
-                    catch(e) { console.error(e); }
+                    try { 
+                        await signInWithPopup(auth, googleProvider); 
+                    } catch(e) { 
+                        console.error(e); 
+                        if(window.location.protocol === 'file:') {
+                            alert('⚠️ ไม่สามารถ Login ได้เนื่องจากเปิดไฟล์ตรงๆ (file://)\n\nGoogle Login จะทำงานบนเซิร์ฟเวอร์เท่านั้น\nกรุณาคลิกขวาแล้วเลือก "Open with Live Server" (ถ้าใช้ VSCode) หรือนำไปฝากบน Firebase Hosting ก่อนครับ');
+                        } else {
+                            alert('เข้าสู่ระบบล้มเหลว!\n\nสาเหตุ: ' + e.message + '\n\n[คำแนะนำ]\nไปที่ Firebase Console > Authentication > Sign-in method\nอย่าลืม "Enable" ส่วนของ Google Provider ด้วยนะครับ');
+                        }
+                    }
                 });
             }
         });

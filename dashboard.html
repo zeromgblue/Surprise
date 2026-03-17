@@ -178,6 +178,16 @@
             .sidebar { display: none; }
             .dash-main { padding: 20px 16px 80px; }
             .mobile-bottom-nav { display: flex; }
+            
+            /* Responsive text fixes */
+            .dash-title { font-size: 1.8rem; margin-bottom: 20px; }
+            .dash-stats { grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+            .stat-box { padding: 16px; border-radius: 16px; }
+            .stat-value { font-size: 1.5rem; }
+            .stat-label { font-size: 0.75rem; }
+            .surprise-grid { grid-template-columns: 1fr; gap: 16px; }
+            .dash-card { padding: 16px; border-radius: 16px; }
+            .dash-card-title { font-size: 1.1rem; }
         }
 
         /* Mobile Bottom Nav */
@@ -407,8 +417,16 @@
 
         // Login
         document.getElementById('login-wall-btn').addEventListener('click', async () => {
-            try { await signInWithPopup(auth, googleProvider); }
-            catch(e) { console.error(e); }
+            try { 
+                await signInWithPopup(auth, googleProvider); 
+            } catch(e) { 
+                console.error(e); 
+                if(window.location.protocol === 'file:') {
+                    alert('⚠️ ไม่สามารถ Login ได้เนื่องจากเปิดไฟล์ตรงๆ (file://)\n\nGoogle Login จะทำงานบนเซิร์ฟเวอร์เท่านั้น\nกรุณาใช้ Live Server หรือ Firebase Hosting');
+                } else {
+                    alert('เข้าสู่ระบบล้มเหลว!\n\nสาเหตุ: ' + e.message + '\n\nเช็คใน Firebase Console ว่าเปิด Google Provider หรือยัง');
+                }
+            }
         });
 
         // Logout
