@@ -281,8 +281,7 @@
                 `;
                 heroDashBtn.style.display = 'none';
                 document.getElementById('google-login-btn').addEventListener('click', async () => {
-                    const provider = new GoogleAuthProvider();
-                    try { await signInWithPopup(auth, provider); }
+                    try { await signInWithPopup(auth, googleProvider); }
                     catch(e) { console.error(e); }
                 });
             }
