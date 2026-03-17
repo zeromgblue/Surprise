@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romantic Love Letter | Surprise</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2D0B1C 0%, #0F0F0F 100%);
+        }
+
+        /* Heart Particles */
+        .heart {
+            position: absolute;
+            color: #FF3366;
+            opacity: 0.6;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            from { transform: translateY(-10vh) rotate(0deg); }
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        /* Envelope */
+        .envelope-container {
+            position: relative;
+            width: 350px;
+            height: 250px;
+            cursor: pointer;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            perspective: 1000px;
+        }
+
+        .envelope-container.open {
+            transform: translateY(150px) scale(0.9);
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #E91E63;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .envelope::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 175px solid transparent;
+            border-right: 175px solid transparent;
+            border-bottom: 125px solid #D81B60;
+            z-index: 2;
+        }
+
+        .envelope::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 175px solid transparent;
+            border-right: 175px solid transparent;
+            border-top: 130px solid #C2185B;
+            transition: transform 0.6s ease;
+            transform-origin: top;
+            z-index: 5;
+        }
+
+        .envelope-container.open .envelope::after {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        /* Letter Content */
+        .letter {
+            position: absolute;
+            bottom: 10px;
+            left: 5%;
+            width: 90%;
+            height: 150px;
+            background: #FFF;
+            padding: 20px;
+            border-radius: 5px;
+            transition: all 0.6s ease;
+            transform: translateY(0);
+            z-index: 3;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            color: #333;
+            border: 1px solid #EEE;
+        }
+
+        .envelope-container.open .letter {
+            transform: translateY(-250px);
+            height: 400px;
+        }
+
+        .letter-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+
+        .heart-seal {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: #FF3366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 6;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-size: 24px;
+        }
+
+        .envelope-container.open .heart-seal {
+            opacity: 0;
+        }
+
+        #back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="btn-secondary" id="back-btn">
+        <span class="material-symbols-rounded">arrow_back</span> กลับตัวเลือก
+    </a>
+
+    <div class="envelope-container" onclick="openEnvelope()" id="env-container">
+        <div class="heart-seal">❤</div>
+        <div class="envelope">
+            <div class="letter">
+                <h2 style="color: #6B21A8; border-bottom: 2px solid #EEE; padding-bottom: 10px;" id="receiver-display">ถึง... [ชื่อคนที่คุณรัก]</h2>
+                <div class="letter-text" id="typewriter"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create falling hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.fontSize = (Math.random() * 10 + 15) + 'px';
+            heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            heart.style.opacity = Math.random() * 0.5 + 0.3;
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 6000);
+        }
+
+        setInterval(createHeart, 300);
+
+        // Setup Dynamic Content
+        let textToType = "ขอบคุณที่อยู่เคียงข้างกันมาเสมอนะ...\n\nทุกวันที่ได้มีคุณในชีวิต มันคือสิ่งที่ดีที่สุดที่เกิดขึ้นกับฉันเลย\nอยากให้รู้ว่ารักคุณมากแค่ไหน\n\nด้วยรักจาก [ชื่อของคุณ]";
+        
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const receiver = urlParams.get('r');
+            const message = urlParams.get('m');
+            const sender = urlParams.get('s');
+
+            if (receiver) document.getElementById('receiver-display').innerText = `ถึง... ${receiver}`;
+            if (message && sender) {
+                textToType = `${message}\n\nด้วยรักจาก.. ${sender}`;
+            }
+        };
+
+        let index = 0;
+
+        function typeEffect() {
+            if (index < textToType.length) {
+                document.getElementById('typewriter').innerHTML += textToType.charAt(index);
+                index++;
+                setTimeout(typeEffect, 50);
+            }
+        }
+
+        function openEnvelope() {
+            const container = document.getElementById('env-container');
+            if (!container.classList.contains('open')) {
+                container.classList.add('open');
+                setTimeout(typeEffect, 1000);
+            }
+        }
+    </script>
+</body>
+</html>

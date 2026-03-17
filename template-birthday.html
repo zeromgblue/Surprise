@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Bash | Surprise</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .birthday-text {
+            font-size: 3.5rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(to bottom, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .birthday-text.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* 3D Cake CSS */
+        .cake {
+            position: relative;
+            width: 250px;
+            height: 200px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .cake:hover {
+            transform: scale(1.05);
+        }
+
+        .cake-layer {
+            position: absolute;
+            width: 100%;
+            background: #6D28D9;
+            border-radius: 50px/25px;
+            box-shadow: 0 10px 0 #4C1D95;
+        }
+
+        .layer-bottom { bottom: 0; height: 100px; }
+        .layer-middle { bottom: 60px; height: 80px; width: 80%; left: 10%; background: #7C3AED; }
+        .layer-top { bottom: 110px; height: 60px; width: 60%; left: 20%; background: #8B5CF6; }
+
+        .candle {
+            position: absolute;
+            background: #EC4899;
+            width: 8px;
+            height: 40px;
+            top: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 4px;
+        }
+
+        .flame {
+            position: absolute;
+            background: #F59E0B;
+            width: 12px;
+            height: 18px;
+            top: -15px;
+            left: -2px;
+            border-radius: 50% 50% 35% 35%;
+            box-shadow: 0 0 15px #F59E0B;
+            animation: flicker 0.1s infinite alternate;
+        }
+
+        @keyframes flicker {
+            from { transform: scale(1) rotate(-1deg); opacity: 1; }
+            to { transform: scale(1.1) rotate(1deg); opacity: 0.8; }
+        }
+
+        .instructions {
+            margin-top: 40px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        #back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+        
+        .message-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            width: 90%;
+            max-width: 500px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 200;
+        }
+
+        .message-modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="btn-secondary" id="back-btn">
+        <span class="material-symbols-rounded">arrow_back</span> กลับ
+    </a>
+
+    <h1 class="birthday-text" id="wish">HAPPY BIRTHDAY!</h1>
+
+    <div class="cake" onclick="blowCandle()">
+        <div class="cake-layer layer-bottom"></div>
+        <div class="cake-layer layer-middle"></div>
+        <div class="cake-layer layer-top"></div>
+        <div class="candle" id="candle">
+            <div class="flame" id="flame"></div>
+        </div>
+    </div>
+
+    <p class="instructions" id="hint">จิ้มที่เค้กเพื่อเป่าเทียน! 🎂</p>
+
+    <div class="message-modal glass-card" id="modal">
+        <h2 style="color: #FFD700; margin-bottom: 15px;" id="modal-receiver">ถึงเพื่อนรัก...</h2>
+        <p style="font-size: 1.1rem; line-height: 1.6;" id="modal-message">
+            ขอให้ปีนี้เป็นปีที่ยอดเยี่ยมสำหรับคุณ เต็มไปด้วยความสุข ความสำเร็จ และรอยยิ้มในทุกๆ วันนะ! <br><br>
+            ขอบคุณที่เป็นเพื่อนที่ดีเสมอมา 🥳✨
+        </p>
+        <button class="btn-primary" onclick="location.reload()" style="margin-top: 30px; width: 100%; justify-content: center;">
+            ดูอีกครั้ง
+        </button>
+    </div>
+
+    <script>
+        // Setup Dynamic Content
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const receiver = urlParams.get('r');
+            const message = urlParams.get('m');
+            const sender = urlParams.get('s');
+
+            if (receiver) document.getElementById('modal-receiver').innerText = `ถึง ${receiver}...`;
+            if (message && sender) {
+                document.getElementById('modal-message').innerHTML = `${message.replace(/\n/g, '<br>')} <br><br><b>จาก: ${sender}</b>`;
+            }
+        };
+
+        function blowCandle() {
+            const flame = document.getElementById('flame');
+            const wish = document.getElementById('wish');
+            const hint = document.getElementById('hint');
+            const modal = document.getElementById('modal');
+
+            if (flame.style.display !== 'none') {
+                // Extinguish flame
+                flame.style.display = 'none';
+                hint.style.display = 'none';
+                
+                // Show wish
+                wish.classList.add('show');
+
+                // Fire confetti
+                const duration = 3 * 1000;
+                const end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({
+                        particleCount: 7,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 },
+                        colors: ['#FFD700', '#FF3366', '#00D2FF']
+                    });
+                    confetti({
+                        particleCount: 7,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 },
+                        colors: ['#FFD700', '#FF3366', '#00D2FF']
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+
+                // Show modal after delay
+                setTimeout(() => {
+                    modal.classList.add('active');
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>

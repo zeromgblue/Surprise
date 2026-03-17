@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Surprise Me</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        .dash-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+            gap: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(255,255,255,0.03);
+            border-right: 1px solid var(--glass-border);
+            padding: 28px 20px;
+            display: flex; flex-direction: column; gap: 8px;
+            position: sticky; top: 0; height: 100vh;
+        }
+        .sidebar-logo {
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.1rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 28px; padding: 0 8px;
+        }
+        .sidebar-logo .material-symbols-rounded { -webkit-text-fill-color: var(--primary); }
+        .nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 14px; border-radius: 12px;
+            color: var(--text-muted); text-decoration: none;
+            font-size: 0.92rem; font-weight: 500;
+            cursor: pointer; transition: all 0.2s ease; border: none; background: none; width: 100%; text-align: left;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.07); color: white;
+        }
+        .nav-item.active { background: rgba(255,51,102,0.12); color: var(--primary); }
+        .nav-item .material-symbols-rounded { font-size: 1.1rem; }
+        .sidebar-divider { height: 1px; background: var(--glass-border); margin: 8px 0; }
+        .sidebar-bottom { margin-top: auto; }
+        .user-sidebar {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px; background: rgba(255,255,255,0.05);
+            border-radius: 14px; border: 1px solid var(--glass-border);
+            margin-bottom: 12px;
+        }
+        .user-sidebar img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--primary); }
+        .user-sidebar-info { overflow: hidden; }
+        .user-sidebar-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-sidebar-email { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Main Content */
+        .dash-main { padding: 40px; overflow-y: auto; }
+        .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; flex-wrap: wrap; gap: 16px; }
+        .dash-title { font-size: 1.8rem; }
+        .dash-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+
+        /* Stats Row */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 36px; }
+        .stat-card {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 18px; padding: 20px;
+        }
+        .stat-card-icon { font-size: 1.4rem; margin-bottom: 12px; }
+        .stat-card-num { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 800; }
+        .stat-card-label { color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; }
+
+        /* Surprise Cards */
+        .surprise-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .surprise-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 20px;
+            transition: all 0.3s ease; position: relative;
+        }
+        .surprise-card:hover { transform: translateY(-3px); border-color: rgba(255,51,102,0.3); }
+        .card-template-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+            padding: 4px 10px; border-radius: 20px; margin-bottom: 14px;
+        }
+        .badge-romantic { background: rgba(255,51,102,0.15); color: #FF6B9D; border: 1px solid rgba(255,51,102,0.3); }
+        .badge-birthday { background: rgba(253,224,71,0.12); color: #FACC15; border: 1px solid rgba(253,224,71,0.3); }
+        .card-receiver { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+        .card-message { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; max-height: 3em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--glass-border); }
+        .card-views { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: var(--text-muted); }
+        .card-privacy { font-size: 0.75rem; color: var(--text-muted); }
+        .card-actions { display: flex; gap: 8px; margin-top: 14px; }
+        .btn-icon {
+            padding: 8px; border-radius: 10px; border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.04); color: var(--text-muted);
+            cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center;
+        }
+        .btn-icon:hover { background: rgba(255,255,255,0.1); color: white; }
+        .btn-icon.danger:hover { background: rgba(255,51,102,0.15); color: var(--primary); border-color: rgba(255,51,102,0.3); }
+        .btn-icon .material-symbols-rounded { font-size: 1rem; }
+        .date-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Link Box in Card */
+        .card-link-box {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(0,0,0,0.25); border: 1px solid var(--glass-border);
+            border-radius: 10px; padding: 8px 12px;
+            margin-top: 14px;
+        }
+        .card-link-box input {
+            flex: 1; background: transparent; border: none;
+            color: var(--accent); font-size: 0.78rem;
+            outline: none; cursor: text;
+            font-family: 'Inter', monospace;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            min-width: 0;
+        }
+        .card-link-copy {
+            flex-shrink: 0; padding: 4px 6px; border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.05); color: var(--text-muted);
+            cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center;
+        }
+        .card-link-copy:hover { background: rgba(0,210,255,0.15); color: var(--accent); border-color: rgba(0,210,255,0.3); }
+        .card-link-copy .material-symbols-rounded { font-size: 0.9rem; }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 80px 20px; }
+        .empty-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
+        .empty-title { font-size: 1.3rem; margin-bottom: 8px; }
+        .empty-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 28px; }
+
+        /* Login Wall */
+        #login-wall {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; text-align: center; padding: 40px;
+        }
+        .login-card { max-width: 420px; width: 100%; }
+
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.06) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 24px; right: 24px;
+            background: var(--glass); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 14px;
+            padding: 14px 20px; display: flex; align-items: center; gap: 10px;
+            font-size: 0.9rem; z-index: 9999; transform: translateY(100px); opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 340px;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        /* Confirm Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px); z-index: 1000; display: none;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box { max-width: 400px; width: 100%; animation: fadeInUp 0.3s ease; }
+        .modal-box h3 { margin-bottom: 12px; }
+        .modal-box p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 28px; line-height: 1.6; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        @media (max-width: 768px) {
+            .dash-layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .dash-main { padding: 20px 16px 80px; }
+            .mobile-bottom-nav { display: flex; }
+        }
+
+        /* Mobile Bottom Nav */
+        .mobile-bottom-nav {
+            display: none; position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(10,10,10,0.95); backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 8px 0 env(safe-area-inset-bottom, 8px);
+            z-index: 200;
+        }
+        .mob-nav-items { display: flex; justify-content: space-around; }
+        .mob-nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 6px 16px; cursor: pointer; color: var(--text-muted);
+            font-size: 0.68rem; font-weight: 500; text-decoration: none;
+            transition: color 0.2s ease; border: none; background: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .mob-nav-item.active { color: var(--primary); }
+        .mob-nav-item .material-symbols-rounded { font-size: 1.3rem; }
+
+    </style>
+</head>
+<body>
+    <!-- Login Wall (shown if not logged in) -->
+    <div id="login-wall" style="display:none;">
+        <div class="glass-card login-card">
+            <div style="text-align:center; margin-bottom: 28px;">
+                <div style="font-size: 3rem; margin-bottom: 12px;">🔐</div>
+                <h2>เข้าสู่ระบบเพื่อดู Dashboard</h2>
+                <p style="color: var(--text-muted); margin-top: 8px; font-size: 0.9rem; line-height: 1.6;">Login ด้วย Google เพื่อดูและจัดการเซอร์ไพรส์ทั้งหมดของคุณ</p>
+            </div>
+            <button class="btn-primary" id="login-wall-btn" style="width:100%; justify-content:center; padding:14px; font-size:1rem;">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.96L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+                เข้าสู่ระบบด้วย Google
+            </button>
+            <a href="index.html" class="btn-secondary" style="width:100%; justify-content:center; margin-top:12px;">
+                <span class="material-symbols-rounded">home</span> กลับหน้าหลัก
+            </a>
+        </div>
+    </div>
+
+    <!-- Dashboard Layout -->
+    <div class="dash-layout" id="dash-layout" style="display:none;">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="index.html" class="sidebar-logo" style="text-decoration:none;">
+                <span class="material-symbols-rounded">magic_button</span>
+                SURPRISE ME
+            </a>
+            <button class="nav-item active" onclick="showSection('surprises')">
+                <span class="material-symbols-rounded">grid_view</span> เซอร์ไพรส์ของฉัน
+            </button>
+            <a href="creator.html" class="nav-item">
+                <span class="material-symbols-rounded">add_circle</span> สร้างใหม่
+            </a>
+            <div class="sidebar-divider"></div>
+            <button class="nav-item" onclick="showSection('help')">
+                <span class="material-symbols-rounded">help</span> วิธีใช้งาน
+            </button>
+            <div class="sidebar-bottom">
+                <div class="user-sidebar" id="sidebar-user">
+                    <img id="sidebar-avatar" src="" alt="avatar">
+                    <div class="user-sidebar-info">
+                        <div class="user-sidebar-name" id="sidebar-name">กำลังโหลด...</div>
+                        <div class="user-sidebar-email" id="sidebar-email"></div>
+                    </div>
+                </div>
+                <button class="nav-item" id="logout-sidebar-btn">
+                    <span class="material-symbols-rounded">logout</span> ออกจากระบบ
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="dash-main">
+            <!-- Section: My Surprises -->
+            <div id="section-surprises">
+                <div class="dash-header">
+                    <div>
+                        <h1 class="dash-title">เซอร์ไพรส์ของฉัน</h1>
+                        <p class="dash-subtitle">ดูและจัดการทุกเซอร์ไพรส์ที่คุณสร้าง</p>
+                    </div>
+                    <a href="creator.html" class="btn-primary">
+                        <span class="material-symbols-rounded">add_circle</span> สร้างใหม่
+                    </a>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-row" id="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-card-icon">🎁</div>
+                        <div class="stat-card-num skeleton" style="height:2rem; width:60px;" id="stat-total"> </div>
+                        <div class="stat-card-label">เซอร์ไพรส์ทั้งหมด</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon">👀</div>
+                        <div class="stat-card-num skeleton" style="height:2rem; width:60px;" id="stat-views"> </div>
+                        <div class="stat-card-label">ยอดดูรวม</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon">💌</div>
+                        <div class="stat-card-num skeleton" style="height:2rem; width:60px;" id="stat-romantic"> </div>
+                        <div class="stat-card-label">Love Letters</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon">🎂</div>
+                        <div class="stat-card-num skeleton" style="height:2rem; width:60px;" id="stat-birthday"> </div>
+                        <div class="stat-card-label">Birthday Cards</div>
+                    </div>
+                </div>
+
+                <!-- Grid -->
+                <div class="surprise-grid" id="surprise-grid">
+                    <!-- Skeleton placeholders -->
+                    ${[1,2,3].map(() => `
+                    <div class="surprise-card">
+                        <div class="skeleton" style="height:20px; width:80px; margin-bottom:14px;"></div>
+                        <div class="skeleton" style="height:22px; width:60%; margin-bottom:10px;"></div>
+                        <div class="skeleton" style="height:14px; width:100%; margin-bottom:6px;"></div>
+                        <div class="skeleton" style="height:14px; width:75%;"></div>
+                    </div>`).join('')}
+                </div>
+            </div>
+
+            <!-- Section: Help -->
+            <div id="section-help" style="display:none;">
+                <div class="dash-header">
+                    <div>
+                        <h1 class="dash-title">วิธีใช้งาน</h1>
+                        <p class="dash-subtitle">คำแนะนำการใช้งาน Surprise Me Platform</p>
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 20px; max-width: 680px;">
+                    <div class="glass-card" style="padding:24px;">
+                        <h3 style="margin-bottom: 12px; color: var(--accent);">🚀 เริ่มต้นใช้งาน</h3>
+                        <ol style="color: var(--text-muted); padding-left: 20px; line-height: 2;">
+                            <li>กดปุ่ม <strong style="color:white;">สร้างใหม่</strong> หรือไปที่หน้าหลักเพื่อเลือกเทมเพลต</li>
+                            <li>กรอกชื่อผู้รับ ข้อความ และชื่อผู้ส่ง</li>
+                            <li>คัดลอกลิงก์และส่งให้คนที่คุณรักได้เลย</li>
+                        </ol>
+                    </div>
+                    <div class="glass-card" style="padding:24px;">
+                        <h3 style="margin-bottom: 12px; color: #FF6B9D;">🔥 Burn After Reading</h3>
+                        <p style="color: var(--text-muted); line-height: 1.7;">ฟีเจอร์พิเศษที่ทำให้เซอร์ไพรส์เปิดได้เพียงครั้งเดียว หลังจากผู้รับเปิดแล้ว ลิงก์จะแสดงข้อความว่าเซอร์ไพรส์ถูกเปิดแล้ว เหมาะสำหรับข้อความลับ</p>
+                    </div>
+                    <div class="glass-card" style="padding:24px;">
+                        <h3 style="margin-bottom: 12px; color: #34D399;">📊 Analytics</h3>
+                        <p style="color: var(--text-muted); line-height: 1.7;">ดู View Count ของแต่ละเซอร์ไพรส์ได้ใน Dashboard นี้ ทำให้คุณรู้ว่าคนที่คุณส่งให้เปิดดูแล้วหรือยัง</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="glass-card modal-box">
+            <h3>🗑️ ลบเซอร์ไพรส์?</h3>
+            <p>เซอร์ไพรส์นี้จะถูกลบออกถาวร ลิงก์จะหยุดทำงานทันที และไม่สามารถกู้คืนได้</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" style="flex:1; justify-content:center;" onclick="closeDeleteModal()">ยกเลิก</button>
+                <button class="btn-primary" style="flex:1; justify-content:center; background:linear-gradient(135deg,#FF3366,#991B1B);" id="confirm-delete-btn">ลบเลย</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span class="material-symbols-rounded" id="toast-icon">check_circle</span>
+        <span id="toast-msg"></span>
+    </div>
+
+    <!-- Mobile Bottom Nav -->
+    <div class="mobile-bottom-nav">
+        <div class="mob-nav-items">
+            <button class="mob-nav-item active" onclick="showSection('surprises')">
+                <span class="material-symbols-rounded">grid_view</span>
+                <span>เซอร์ไพรส์</span>
+            </button>
+            <a href="creator.html" class="mob-nav-item">
+                <span class="material-symbols-rounded">add_circle</span>
+                <span>สร้างใหม่</span>
+            </a>
+            <button class="mob-nav-item" onclick="showSection('help')">
+                <span class="material-symbols-rounded">help</span>
+                <span>วิธีใช้งาน</span>
+            </button>
+            <button class="mob-nav-item" id="logout-mobile-btn">
+                <span class="material-symbols-rounded">logout</span>
+                <span>ออกจากระบบ</span>
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db, googleProvider } from './firebase-config.js';
+        import { onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+        import { collection, query, where, orderBy, getDocs, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+        let currentUser = null;
+        let allSurprises = [];
+        let deleteTargetId = null;
+        let unsubscribe = null; // For Firestore real-time listener
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('login-wall').style.display = 'none';
+                document.getElementById('dash-layout').style.display = 'grid';
+
+                // Update sidebar
+                document.getElementById('sidebar-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'U')}&background=FF3366&color=fff`;
+                document.getElementById('sidebar-name').textContent = user.displayName || 'ผู้ใช้';
+                document.getElementById('sidebar-email').textContent = user.email || '';
+
+                loadSurprises(user.uid); // Use the real-time listener
+            } else {
+                document.getElementById('login-wall').style.display = 'flex';
+                document.getElementById('dash-layout').style.display = 'none';
+                if (unsubscribe) {
+                    unsubscribe(); // Unsubscribe when user logs out
+                    unsubscribe = null;
+                }
+            }
+        });
+
+        // Login
+        document.getElementById('login-wall-btn').addEventListener('click', async () => {
+            try { await signInWithPopup(auth, googleProvider); }
+            catch(e) { console.error(e); }
+        });
+
+        // Logout
+        document.getElementById('logout-sidebar-btn').addEventListener('click', () => signOut(auth));
+        document.getElementById('logout-mobile-btn').addEventListener('click', () => signOut(auth));
+
+
+        // Load Surprises from Firestore — REAL-TIME with onSnapshot
+        function loadSurprises(uid) {
+            // Unsubscribe previous listener if any
+            if (unsubscribe) unsubscribe();
+            try {
+                const q = query(
+                    collection(db, 'surprises'),
+                    where('uid', '==', uid)
+                );
+                unsubscribe = onSnapshot(q, (snapshot) => {
+                    allSurprises = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                    // Sort newest first client-side
+                    allSurprises.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
+                    renderStats(allSurprises);
+                    renderGrid(allSurprises);
+                }, (err) => {
+                    console.error('Firestore realtime error:', err);
+                    const errMsg = err?.message || 'Unknown error';
+                    const isPermission = errMsg.includes('permission') || errMsg.includes('Missing or insufficient');
+                    const isNotFound = errMsg.includes('NOT_FOUND') || errMsg.includes('not-found');
+                    let suggestion = isPermission
+                        ? 'ไปที่ Firestore → Rules แล้ววาง Security Rules ให้ถูกต้อง'
+                        : isNotFound
+                        ? 'ยังไม่ได้สร้าง Firestore Database — ไปที่ Firebase Console → Firestore Database → Create database'
+                        : 'เปิด Console (F12) เพื่อดู error เพิ่มเติม';
+                    document.getElementById('surprise-grid').innerHTML = `
+                        <div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
+                            <div style="font-size:2.5rem;margin-bottom:16px;">⚠️</div>
+                            <h3 style="margin-bottom:8px;color:#f87171;">โหลดข้อมูลไม่สำเร็จ</h3>
+                            <code style="background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:6px;font-size:0.78rem;display:block;margin:8px auto 16px;max-width:100%;word-break:break-all;color:#f87171;">${errMsg}</code>
+                            <p style="color:var(--text-muted);font-size:0.88rem;max-width:440px;margin:0 auto 24px;line-height:1.8;">${suggestion}</p>
+                            <button class="btn-secondary" onclick="location.reload()"><span class="material-symbols-rounded">refresh</span> ลองใหม่</button>
+                        </div>
+                    `;
+                    ['stat-total','stat-views','stat-romantic','stat-birthday'].forEach(id => {
+                        const el = document.getElementById(id);
+                        el.classList.remove('skeleton'); el.style.height = ''; el.style.width = ''; el.textContent = '—';
+                    });
+                });
+            } catch(err) {
+                console.error('onSnapshot setup error:', err);
+            }
+        }
+
+        function renderStats(data) {
+            const total = data.length;
+            const views = data.reduce((sum, s) => sum + (s.views || 0), 0);
+            const romantic = data.filter(s => s.template === 'romantic').length;
+            const birthday = data.filter(s => s.template === 'birthday').length;
+
+            const setNum = (id, val) => {
+                const el = document.getElementById(id);
+                el.classList.remove('skeleton');
+                el.style.height = '';
+                el.style.width = '';
+                el.textContent = val;
+            };
+            setNum('stat-total', total);
+            setNum('stat-views', views);
+            setNum('stat-romantic', romantic);
+            setNum('stat-birthday', birthday);
+        }
+
+        function renderGrid(data) {
+            const grid = document.getElementById('surprise-grid');
+            if (data.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1;">
+                        <div class="empty-state">
+                            <div class="empty-icon">🎁</div>
+                            <div class="empty-title">ยังไม่มีเซอร์ไพรส์</div>
+                            <div class="empty-desc">เริ่มสร้างเซอร์ไพรส์แรกของคุณเลย!</div>
+                            <a href="creator.html" class="btn-primary">
+                                <span class="material-symbols-rounded">add_circle</span> สร้างเลย
+                            </a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = data.map(s => {
+                const isRomantic = s.template === 'romantic';
+                const badgeClass = isRomantic ? 'badge-romantic' : 'badge-birthday';
+                const badgeLabel = isRomantic ? '💌 Love Letter' : '🎂 Birthday';
+                const privacyIcon = s.privacy === 'once' ? '🔥 ครั้งเดียว' : '🔁 หลายครั้ง';
+                const viewUrl = `view.html?id=${s.id}`;
+                const fullUrl = `${window.location.origin}${window.location.pathname.replace('dashboard.html','')}view.html?id=${s.id}`;
+                const dateStr = s.createdAt ? new Date(s.createdAt.seconds * 1000).toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'2-digit' }) : '';
+
+                return `
+                <div class="surprise-card" id="card-${s.id}">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <span class="card-template-badge ${badgeClass}">${badgeLabel}</span>
+                        <span class="card-privacy">${privacyIcon}</span>
+                    </div>
+                    <div class="card-receiver">ถึง ${escapeHtml(s.receiver)}</div>
+                    <div class="card-message">${escapeHtml(s.message)}</div>
+                    <div class="date-label">📅 ${dateStr} · จาก: ${escapeHtml(s.sender)}</div>
+
+                    <!-- Link Box -->
+                    <div class="card-link-box">
+                        <span class="material-symbols-rounded" style="font-size:0.9rem; color:var(--accent); flex-shrink:0;">link</span>
+                        <input type="text" value="${fullUrl}" readonly id="link-input-${s.id}" onclick="this.select()" title="คลิกเพื่อเลือก">
+                        <button class="card-link-copy" title="คัดลอกลิงก์" id="copy-btn-${s.id}" onclick="copyCardLink('${s.id}')">
+                            <span class="material-symbols-rounded">content_copy</span>
+                        </button>
+                    </div>
+
+                    <div class="card-meta">
+                        <div class="card-views">
+                            <span class="material-symbols-rounded" style="font-size:0.9rem;">visibility</span>
+                            ${s.views || 0} ครั้ง
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <a href="${viewUrl}" target="_blank" class="btn-icon" title="เปิดดูเซอร์ไพรส์">
+                                <span class="material-symbols-rounded">open_in_new</span>
+                            </a>
+                            <button class="btn-icon danger" title="ลบ" onclick="confirmDelete('${s.id}')">
+                                <span class="material-symbols-rounded">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Delete
+        window.confirmDelete = (id) => {
+            deleteTargetId = id;
+            document.getElementById('delete-modal').classList.add('active');
+        };
+        window.closeDeleteModal = () => {
+            document.getElementById('delete-modal').classList.remove('active');
+            deleteTargetId = null;
+        };
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            if (!deleteTargetId) return;
+            try {
+                await deleteDoc(doc(db, 'surprises', deleteTargetId));
+                allSurprises = allSurprises.filter(s => s.id !== deleteTargetId);
+                document.getElementById(`card-${deleteTargetId}`)?.remove();
+                renderStats(allSurprises);
+                showToast('✅ ลบเซอร์ไพรส์แล้ว', 'check_circle');
+            } catch(e) {
+                showToast('❌ ลบไม่สำเร็จ กรุณาลองใหม่', 'error');
+            }
+            closeDeleteModal();
+        });
+
+        // Copy link
+        window.copyCardLink = async (id) => {
+            const url = `${window.location.origin}${window.location.pathname.replace('dashboard.html','')}view.html?id=${id}`;
+            try {
+                await navigator.clipboard.writeText(url);
+                // Visual feedback on copy button
+                const btn = document.getElementById('copy-btn-' + id);
+                if (btn) {
+                    btn.innerHTML = '<span class="material-symbols-rounded">check</span>';
+                    btn.style.color = 'var(--accent)';
+                    btn.style.borderColor = 'rgba(0,210,255,0.4)';
+                    setTimeout(() => {
+                        btn.innerHTML = '<span class="material-symbols-rounded">content_copy</span>';
+                        btn.style.color = '';
+                        btn.style.borderColor = '';
+                    }, 2000);
+                }
+                showToast('📋 คัดลอกลิงก์แล้ว!', 'content_copy');
+            } catch {
+                // Fallback: select the input
+                const input = document.getElementById('link-input-' + id);
+                if (input) { input.select(); document.execCommand('copy'); }
+            }
+        };
+
+        // Section switching
+        window.showSection = (name) => {
+            document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
+            document.getElementById('section-' + name).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        };
+
+        // Toast
+        function showToast(msg, icon = 'check_circle') {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            document.getElementById('toast-icon').textContent = icon;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function escapeHtml(str = '') {
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+        }
+    </script>
+</body>
+</html>

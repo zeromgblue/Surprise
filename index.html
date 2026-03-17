@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise Me | สร้างเซอร์ไพรส์สุดพิเศษเพื่อคนที่คุณรัก</title>
+    <meta name="description" content="เปลี่ยนความรู้สึกของคุณให้เป็นของขวัญดิจิทัลสุดพิเศษ สร้างเซอร์ไพรส์วันเกิด บอกรัก หรือส่งต่อความยินดีได้ง่ายๆ ในลิงก์เดียว">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        .nav-auth { display: flex; align-items: center; gap: 12px; }
+        .user-chip {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px; padding: 6px 14px 6px 6px;
+            cursor: pointer; transition: all 0.3s ease;
+            text-decoration: none; color: white;
+        }
+        .user-chip:hover { background: rgba(255,255,255,0.13); }
+        .user-chip img {
+            width: 28px; height: 28px; border-radius: 50%;
+            border: 2px solid var(--primary);
+        }
+        .user-chip span.name { font-weight: 600; font-size: 0.9rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .badge-new {
+            background: linear-gradient(135deg, #00D2FF, #6B21A8);
+            color: white; font-size: 0.65rem; font-weight: 700;
+            padding: 2px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .feature-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px; margin-top: 80px;
+        }
+        .feature-item {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 28px;
+            transition: all 0.3s ease;
+        }
+        .feature-item:hover { transform: translateY(-4px); border-color: rgba(0,210,255,0.3); }
+        .feature-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 16px;
+        }
+        .how-section { padding: 100px 0; text-align: center; }
+        .steps { display: flex; gap: 32px; justify-content: center; margin-top: 60px; flex-wrap: wrap; }
+        .step { flex: 1; min-width: 200px; max-width: 260px; }
+        .step-num {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.2rem;
+            margin: 0 auto 16px;
+        }
+        .template-badge {
+            position: absolute; top: 14px; right: 14px;
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.06em; padding: 4px 10px; border-radius: 20px;
+        }
+        .badge-hot { background: rgba(255,51,102,0.2); color: #FF3366; border: 1px solid rgba(255,51,102,0.3); }
+        .badge-popular { background: rgba(0,210,255,0.15); color: #00D2FF; border: 1px solid rgba(0,210,255,0.3); }
+        .badge-soon { background: rgba(161,161,170,0.15); color: #A1A1AA; border: 1px solid rgba(161,161,170,0.3); }
+        .hero-stats { display: flex; gap: 40px; justify-content: center; margin-top: 50px; flex-wrap: wrap; }
+        .stat { text-align: center; }
+        .stat-num { font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 800; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-label { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+        .cta-section {
+            margin: 80px 0; padding: 60px; border-radius: 28px;
+            background: linear-gradient(135deg, rgba(255,51,102,0.12), rgba(107,33,168,0.12));
+            border: 1px solid rgba(255,51,102,0.2); text-align: center;
+        }
+        #auth-loading { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="fade-in">
+            <a href="index.html" class="logo" style="text-decoration:none;">
+                <span class="material-symbols-rounded">magic_button</span>
+                SURPRISE ME
+            </a>
+            <nav class="nav-auth" id="nav-auth">
+                <div id="auth-loading"></div>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(0,210,255,0.1); border: 1px solid rgba(0,210,255,0.25); border-radius: 50px; padding: 6px 16px; margin-bottom: 30px;" class="fade-in">
+                <span class="material-symbols-rounded" style="font-size:1rem; color: var(--accent);">auto_awesome</span>
+                <span style="font-size: 0.85rem; color: var(--accent);">ตอนนี้รองรับ Firebase — บันทึกเซอร์ไพรส์ถาวร</span>
+            </div>
+            <h1 class="hero-title fade-in" style="animation-delay: 0.2s;">
+                สร้างรอยยิ้มผ่าน <br>
+                <span style="background: linear-gradient(to right, #00D2FF, #FF3366); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ความทรงจำดิจิทัล</span>
+            </h1>
+            <p class="hero-subtitle fade-in" style="animation-delay: 0.4s;">
+                เปลี่ยนข้อความของคุณให้เป็นเซอร์ไพรส์สุดว้าว ส่งให้คนที่คุณรักผ่านลิงก์สั้นๆ เพียงลิงก์เดียว — ไม่มีหมดอายุ ปลอดภัย 100%
+            </p>
+            <div class="fade-in" style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation-delay: 0.6s;">
+                <a href="#templates" class="btn-primary">
+                    <span class="material-symbols-rounded">add_circle</span>
+                    เริ่มสร้างเซอร์ไพรส์เลย
+                </a>
+                <a href="dashboard.html" class="btn-secondary" id="hero-dash-btn" style="display:none;">
+                    <span class="material-symbols-rounded">grid_view</span>
+                    ดูผลงานของฉัน
+                </a>
+            </div>
+
+            <div class="hero-stats fade-in" style="animation-delay: 0.8s;">
+                <div class="stat">
+                    <div class="stat-num">∞</div>
+                    <div class="stat-label">เซอร์ไพรส์ที่สร้างได้</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">20</div>
+                    <div class="stat-label">เทมเพลตพรีเมียม</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">100%</div>
+                    <div class="stat-label">ฟรี ไม่มีค่าใช้จ่าย</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="how-section fade-in" style="animation-delay: 1s;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 16px;">วิธีใช้งาน ง่ายมาก</h2>
+            <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto;">3 ขั้นตอน พร้อมส่งให้คนที่คุณรักภายใน 1 นาที</p>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h3 style="margin-bottom: 8px;">เลือกเทมเพลต</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">เลือกรูปแบบที่เหมาะกับโอกาส ไม่ว่าจะเป็นวันเกิดหรือบอกรัก</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h3 style="margin-bottom: 8px;">ใส่ข้อความ</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">พิมพ์ชื่อผู้รับ ข้อความจากหัวใจ และลงชื่อผู้ส่ง</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h3 style="margin-bottom: 8px;">แชร์ลิงก์</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">คัดลอกลิงก์สั้นๆ แล้วส่งให้คนที่คุณรักได้เลย!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Templates -->
+        <section id="templates" class="fade-in" style="animation-delay: 0.8s;">
+            <h2 style="font-size: 2.5rem; text-align: center; margin-bottom: 16px;">เลือกรูปแบบที่ใช่</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 50px;">เราคัดสรรดีไซน์ที่ดีที่สุดมาเพื่อทุกโอกาสสำคัญของคุณ</p>
+            
+            <div class="template-grid" id="featured-templates">
+                <!-- Data will be loaded from templates-data.js -->
+                <div style="text-align:center; grid-column:1/-1; padding:40px; color:var(--text-muted);">กำลังโหลดเทมเพลต...</div>
+            </div>
+
+            <div style="text-align:center; margin-top:40px;">
+                <a href="creator.html" class="btn-secondary" style="display:inline-flex; align-items:center; gap:8px; padding:12px 28px; font-size:1rem; border-radius:50px;">
+                    <span class="material-symbols-rounded">apps</span> ดูทั้งหมด 20 แบบ
+                </a>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section style="padding: 100px 0;">
+            <h2 style="font-size: 2.5rem; text-align: center; margin-bottom: 16px;" class="fade-in">เต็มไปด้วยฟีเจอร์ที่รัก</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 0;" class="fade-in">ทุกฟีเจอร์ออกแบบมาเพื่อให้คุณสร้างเซอร์ไพรส์ได้ง่ายและสวยงามที่สุด</p>
+            <div class="feature-grid fade-in">
+                <div class="feature-item">
+                    <div class="feature-icon" style="background: rgba(255,51,102,0.15);">
+                        <span class="material-symbols-rounded" style="color:var(--primary);">cloud_done</span>
+                    </div>
+                    <h3 style="margin-bottom: 8px; font-size: 1.1rem;">บันทึกถาวรบน Cloud</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">เซอร์ไพรส์ของคุณเก็บบน Firebase ปลอดภัย ไม่มีหายหรือหมดอายุ</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon" style="background: rgba(0,210,255,0.15);">
+                        <span class="material-symbols-rounded" style="color:var(--accent);">link</span>
+                    </div>
+                    <h3 style="margin-bottom: 8px; font-size: 1.1rem;">ลิงก์สั้น แชร์ง่าย</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">ลิงก์ในรูปแบบ /view/[id] สวยงาม ส่งได้ทุก Platform</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon" style="background: rgba(107,33,168,0.2);">
+                        <span class="material-symbols-rounded" style="color:#A78BFA);">manage_accounts</span>
+                    </div>
+                    <h3 style="margin-bottom: 8px; font-size: 1.1rem;">Dashboard ส่วนตัว</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Login ด้วย Google เพื่อดูและจัดการเซอร์ไพรส์ทั้งหมดของคุณ</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon" style="background: rgba(16,185,129,0.15);">
+                        <span class="material-symbols-rounded" style="color:#34D399;">bar_chart</span>
+                    </div>
+                    <h3 style="margin-bottom: 8px; font-size: 1.1rem;">ติดตามยอดดู</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">รู้ว่าคนที่คุณส่งให้เปิดดูแล้วหรือยัง ด้วย View Count แบบ Real-time</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <div class="cta-section fade-in">
+            <span class="material-symbols-rounded" style="font-size: 3rem; color: var(--primary);">favorite</span>
+            <h2 style="font-size: 2.2rem; margin: 16px 0 12px;">พร้อมสร้างเซอร์ไพรส์แล้วหรือยัง?</h2>
+            <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 32px; line-height: 1.7;">ไม่ต้องสมัครก็ใช้ได้ แต่ถ้า Login จะจัดการเซอร์ไพรส์ของคุณได้ง่ายกว่า</p>
+            <a href="#templates" class="btn-primary" style="font-size: 1.05rem; padding: 14px 36px;">
+                <span class="material-symbols-rounded">add_circle</span>
+                สร้างเลย ฟรี 100%
+            </a>
+        </div>
+
+        <footer style="margin-top: 60px; padding: 40px 0; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; color: var(--text-muted); font-size: 0.9rem; gap: 16px; flex-wrap: wrap;">
+            <p>© 2026 SURPRISE ME — มอบความสุขแบบดิจิทัล</p>
+            <div style="display: flex; gap: 20px;">
+                <a href="dashboard.html" style="color: var(--text-muted); text-decoration: none;">Dashboard</a>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { auth, googleProvider } from './firebase-config.js';
+        import { onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+        import { TEMPLATES } from './templates-data.js';
+
+        let currentUser = null;
+
+        // Render Featured Templates
+        function renderFeaturedTemplates() {
+            const grid = document.getElementById('featured-templates');
+            const featuredIds = ['romantic', 'birthday', 'proposal', 'friendship'];
+            const featured = TEMPLATES.filter(t => featuredIds.includes(t.id));
+
+            grid.innerHTML = featured.map(t => `
+                <div class="glass-card template-item">
+                    <div style="height:120px; background:linear-gradient(135deg, ${t.from}15, ${t.to}15); margin:-28px -28px 24px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid ${t.from}33;">
+                        <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,${t.from},${t.to});display:flex;align-items:center;justify-content:center;box-shadow:0 10px 20px rgba(0,0,0,0.3);">
+                            <span class="material-symbols-rounded" style="color:white;font-variation-settings:'FILL' 1;font-size:2rem;">${t.icon}</span>
+                        </div>
+                    </div>
+                    <img src="" alt="" style="display:none;" />
+                    <h3 style="display:flex;align-items:center;gap:8px;"><span class="material-symbols-rounded" style="color:${t.from};font-variation-settings:'FILL' 1;font-size:1.2rem;">${t.icon}</span> ${t.nameTh}</h3>
+                    <p style="color: var(--text-muted); margin: 8px 0 20px; font-size: 0.85rem; line-height: 1.6; height: 3em;">
+                        ${t.desc}
+                    </p>
+                    <a href="creator.html?t=${t.id}" class="btn-primary" style="width: 100%; justify-content: center;">
+                        <span class="material-symbols-rounded">magic_button</span> เริ่มสร้าง
+                    </a>
+                </div>
+            `).join('');
+        }
+        renderFeaturedTemplates();
+
+        const navAuth = document.getElementById('nav-auth');
+        const heroDashBtn = document.getElementById('hero-dash-btn');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                navAuth.innerHTML = `
+                    <a href="dashboard.html" class="user-chip" title="ดูผลงานของฉัน">
+                        <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'U') + '&background=FF3366&color=fff'}" alt="avatar">
+                        <span class="name">${user.displayName || user.email}</span>
+                    </a>
+                    <button class="btn-secondary" id="logout-btn" style="padding: 8px 16px; font-size: 0.85rem;">
+                        <span class="material-symbols-rounded" style="font-size:1rem;">logout</span>
+                    </button>
+                `;
+                heroDashBtn.style.display = 'inline-flex';
+                document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+            } else {
+                navAuth.innerHTML = `
+                    <a href="#templates" class="btn-secondary" style="padding: 8px 20px; font-size: 0.9rem;">ดูเทมเพลต</a>
+                    <button class="btn-primary" id="google-login-btn" style="padding: 8px 20px; font-size: 0.9rem;">
+                        <svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.96L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+                        เข้าสู่ระบบ
+                    </button>
+                `;
+                heroDashBtn.style.display = 'none';
+                document.getElementById('google-login-btn').addEventListener('click', async () => {
+                    const provider = new GoogleAuthProvider();
+                    try { await signInWithPopup(auth, provider); }
+                    catch(e) { console.error(e); }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
