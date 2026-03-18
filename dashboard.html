@@ -10,6 +10,7 @@
     <link rel="dns-prefetch" href="https://www.gstatic.com">
     <link rel="dns-prefetch" href="https://firestore.googleapis.com">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
         .dash-layout {
             display: grid;
@@ -223,7 +224,9 @@
         .header-logo {
             font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem;
             background: linear-gradient(to right, var(--primary), var(--accent));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
     </style>
@@ -394,7 +397,7 @@
     <script type="module">
         import { auth, db, googleProvider } from './firebase-config.js';
         import { onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-        import { collection, query, where, orderBy, getDocs, deleteDoc, doc, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+        import { collection, query, where, orderBy, getDocs, deleteDoc, doc, onSnapshot, limit, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
         let currentUser = null;
         let userData = null;
@@ -403,7 +406,7 @@
         let unsubscribe = null;
         let userUnsubscribe = null;
 
-        const SUPER_ADMIN_UID = 'qqzXIApGiHVh2r78spN1BeZ7Qzz2';
+        const SUPER_ADMIN_UID = 'qqzXIApGiHVh2r78spI1BeZ7Qzz2'; // Actual Super Admin UID
 
         window.toggleSidebar = () => {
             const sb = document.getElementById('sidebar');
@@ -412,37 +415,42 @@
             ov.classList.toggle('active');
         };
 
+        // Initialize Section Display
+        window.showSection = (name) => {
+            document.getElementById('section-surprises').style.display = (name === 'surprises') ? 'block' : 'none';
+            document.getElementById('section-help').style.display = (name === 'help') ? 'block' : 'none';
+            
+            // UI Active State
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                const isMatch = btn.getAttribute('onclick')?.includes(`'${name}'`);
+                btn.classList.toggle('active', !!isMatch);
+            });
+        };
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 document.getElementById('login-wall').style.display = 'none';
                 document.getElementById('dash-layout').style.display = 'grid';
 
-                // Sidebar Info
+                // Sidebar User Info
                 document.getElementById('sidebar-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=FF3366&color=fff`;
                 document.getElementById('sidebar-name').textContent = user.displayName || 'ผู้ใช้';
                 document.getElementById('sidebar-email').textContent = user.email || '';
 
-                // Load User Data & Permissions
+                // Listen for User Role
                 if (userUnsubscribe) userUnsubscribe();
                 userUnsubscribe = onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
                     const data = docSnap.exists() ? docSnap.data() : { tier: 'free' };
                     userData = data;
                     
-                    // Admin Permission Logic
-                    const isSuper = user.uid === SUPER_ADMIN_UID;
-                    const isAnyAdmin = data.role === 'admin' || isSuper;
+                    const isSuper = user.uid === 'qqzXIApGiHVh2r78spN1BeZ7Qzz2'; // Confirming SUPER_ADMIN_UID
+                    const isAdmin = data.role === 'admin' || isSuper;
 
-                    if (isAnyAdmin) {
+                    if (isAdmin) {
                         document.getElementById('admin-links').style.display = 'block';
-                        // Promote Admin link for all admins
-                        document.getElementById('admin-users-link').style.display = 'flex';
-                        // Payment Management ONLY for Super Admin
-                        if (isSuper) {
-                            document.getElementById('admin-pay-link').style.display = 'flex';
-                        } else {
-                            document.getElementById('admin-pay-link').style.display = 'none';
-                        }
+                        document.getElementById('admin-users-link').style.display = (isSuper || data.role === 'admin') ? 'flex' : 'none';
+                        document.getElementById('admin-pay-link').style.display = isSuper ? 'flex' : 'none';
                     } else {
                         document.getElementById('admin-links').style.display = 'none';
                     }
@@ -457,54 +465,84 @@
             }
         });
 
-        // Other existing logic remains similar...
-        // Login
-        document.getElementById('login-wall-btn').addEventListener('click', async () => {
-            try { await signInWithPopup(auth, googleProvider); } catch(e) { console.error(e); }
-        });
-
-        // Logout
-        document.getElementById('logout-sidebar-btn').addEventListener('click', () => signOut(auth));
+        // Login / Logout
+        document.getElementById('login-wall-btn').onclick = () => signInWithPopup(auth, googleProvider);
+        document.getElementById('logout-sidebar-btn').onclick = () => signOut(auth);
 
         function loadSurprises(uid) {
             if (unsubscribe) unsubscribe();
-            const q = query(collection(db, 'surprises'), where('uid', '==', uid), orderBy('createdAt', 'desc'), limit(50));
+            // Simplified query to avoid index requirement
+            const q = query(collection(db, 'surprises'), where('uid', '==', uid));
+            
             unsubscribe = onSnapshot(q, (snapshot) => {
                 allSurprises = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                allSurprises.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
+                // Local sort by newest
+                allSurprises.sort((a, b) => {
+                    const timeA = a.createdAt?.seconds || 0;
+                    const timeB = b.createdAt?.seconds || 0;
+                    return timeB - timeA;
+                });
                 renderStats(allSurprises);
                 renderGrid(allSurprises);
+            }, (err) => {
+                console.error("Firestore error:", err);
+                showToast("⚠️ ไม่สามารถโหลดข้อมูลได้: " + err.message);
+                renderGrid([]);
             });
         }
 
         function renderStats(data) {
-            document.getElementById('stat-total').textContent = data.length;
-            document.getElementById('stat-views').textContent = data.reduce((sum, s) => sum + (s.views || 0), 0);
-            document.getElementById('stat-romantic').textContent = data.filter(s => s.template === 'romantic').length;
-            document.getElementById('stat-birthday').textContent = data.filter(s => s.template === 'birthday').length;
-            ['stat-total','stat-views','stat-romantic','stat-birthday'].forEach(id => document.getElementById(id).classList.remove('skeleton'));
+            const total = data.length;
+            const views = data.reduce((s, p) => s + (p.views || 0), 0);
+            const love  = data.filter(s => s.template === 'romantic').length;
+            const bday  = data.filter(s => s.template === 'birthday').length;
+
+            const updateField = (id, val) => {
+                const el = document.getElementById(id);
+                el.classList.remove('skeleton');
+                el.style.width = 'auto';
+                el.textContent = val;
+            };
+
+            updateField('stat-total', total);
+            updateField('stat-views', views);
+            updateField('stat-romantic', love);
+            updateField('stat-birthday', bday);
         }
 
         function renderGrid(data) {
             const grid = document.getElementById('surprise-grid');
             if (data.length === 0) {
-                grid.innerHTML = '<div style="grid-column:1/-1;"><div class="empty-state"><div class="empty-icon">🎁</div><h3>ยังไม่มีเซอร์ไพรส์</h3><a href="creator.html" class="btn-primary" style="margin-top:20px;">สร้างเลย</a></div></div>';
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                        <div style="font-size: 4rem; opacity: 0.2; margin-bottom: 20px;">🎁</div>
+                        <h3 style="margin-bottom: 8px;">ยังไม่มีเซอร์ไพรส์</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 24px;">เริ่มต้นสร้างเซอร์ไพรส์แรกของคุณเลย!</p>
+                        <a href="creator.html" class="btn-primary" style="display:inline-flex;">สร้างเลย</a>
+                    </div>`;
                 return;
             }
+
             grid.innerHTML = data.map(s => {
+                const typeLabel = s.template === 'romantic' ? 'Love Letter' : 'Birthday';
+                const typeClass = s.template === 'romantic' ? 'badge-romantic' : 'badge-birthday';
                 const fullUrl = `${window.location.origin}${window.location.pathname.replace('dashboard.html','')}view.html?id=${s.id}`;
+                
                 return `
                 <div class="surprise-card" id="card-${s.id}">
+                    <span class="card-template-badge ${typeClass}">${typeLabel}</span>
                     <div class="card-receiver">ถึง ${escapeHtml(s.receiver)}</div>
                     <div class="card-message">${escapeHtml(s.message)}</div>
                     <div class="card-link-box">
                         <input type="text" value="${fullUrl}" readonly onclick="this.select()">
-                        <button class="card-link-copy" onclick="copyCardLink('${s.id}')"><span class="material-symbols-rounded">content_copy</span></button>
+                        <button class="card-link-copy" onclick="copyCardLink('${s.id}', '${fullUrl}')">
+                            <span class="material-symbols-rounded">content_copy</span>
+                        </button>
                     </div>
                     <div class="card-meta">
                         <div class="card-views"><span class="material-symbols-rounded">visibility</span> ${s.views || 0} ครั้ง</div>
                         <div style="display:flex; gap:8px;">
-                            <a href="view.html?id=${s.id}" target="_blank" class="btn-icon"><span class="material-symbols-rounded">open_in_new</span></a>
+                            <a href="${fullUrl}" target="_blank" class="btn-icon"><span class="material-symbols-rounded">open_in_new</span></a>
                             <button class="btn-icon danger" onclick="confirmDelete('${s.id}')"><span class="material-symbols-rounded">delete</span></button>
                         </div>
                     </div>
@@ -512,207 +550,24 @@
             }).join('');
         }
 
-        window.confirmDelete = (id) => { deleteTargetId = id; document.getElementById('delete-modal').classList.add('active'); };
-        window.closeDeleteModal = () => { document.getElementById('delete-modal').classList.remove('active'); };
-        document.getElementById('confirm-delete-btn').onclick = async () => {
-            if (deleteTargetId) await deleteDoc(doc(db, 'surprises', deleteTargetId));
-            closeDeleteModal();
-        };
-
-        window.copyCardLink = async (id) => {
-            const url = `${window.location.origin}${window.location.pathname.replace('dashboard.html','')}view.html?id=${id}`;
-            await navigator.clipboard.writeText(url);
-            showToast('📋 คัดลอกลิงก์แล้ว!');
-        };
-
-        window.showSection = (name) => {
-            document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
-            document.getElementById('section-' + name).style.display = 'block';
-            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-        };
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-msg').textContent = msg;
-            t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-        function escapeHtml(str = '') { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-    </script>
-</body>
-</html>
-
-        // Login
-        document.getElementById('login-wall-btn').addEventListener('click', async () => {
-            try { 
-                await signInWithPopup(auth, googleProvider); 
-            } catch(e) { 
-                console.error(e); 
-                if(window.location.protocol === 'file:') {
-                    alert('⚠️ ไม่สามารถ Login ได้เนื่องจากเปิดไฟล์ตรงๆ (file://)\n\nGoogle Login จะทำงานบนเซิร์ฟเวอร์เท่านั้น\nกรุณาใช้ Live Server หรือ Firebase Hosting');
-                } else {
-                    alert('เข้าสู่ระบบล้มเหลว!\n\nสาเหตุ: ' + e.message + '\n\nเช็คใน Firebase Console ว่าเปิด Google Provider หรือยัง');
-                }
-            }
-        });
-
-        // Logout
-        document.getElementById('logout-sidebar-btn').addEventListener('click', () => signOut(auth));
-        document.getElementById('logout-mobile-btn').addEventListener('click', () => signOut(auth));
-
-
-        // Load Surprises from Firestore — REAL-TIME with onSnapshot
-        function loadSurprises(uid) {
-            // Unsubscribe previous listener if any
-            if (unsubscribe) unsubscribe();
-            try {
-                const q = query(
-                    collection(db, 'surprises'),
-                    where('uid', '==', uid)
-                );
-                unsubscribe = onSnapshot(q, (snapshot) => {
-                    allSurprises = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                    // Sort newest first client-side
-                    allSurprises.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
-                    renderStats(allSurprises);
-                    renderGrid(allSurprises);
-                }, (err) => {
-                    console.error('Firestore realtime error:', err);
-                    const errMsg = err?.message || 'Unknown error';
-                    const isPermission = errMsg.includes('permission') || errMsg.includes('Missing or insufficient');
-                    const isNotFound = errMsg.includes('NOT_FOUND') || errMsg.includes('not-found');
-                    let suggestion = isPermission
-                        ? 'ไปที่ Firestore → Rules แล้ววาง Security Rules ให้ถูกต้อง'
-                        : isNotFound
-                        ? 'ยังไม่ได้สร้าง Firestore Database — ไปที่ Firebase Console → Firestore Database → Create database'
-                        : 'เปิด Console (F12) เพื่อดู error เพิ่มเติม';
-                    document.getElementById('surprise-grid').innerHTML = `
-                        <div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
-                            <div style="font-size:2.5rem;margin-bottom:16px;">⚠️</div>
-                            <h3 style="margin-bottom:8px;color:#f87171;">โหลดข้อมูลไม่สำเร็จ</h3>
-                            <code style="background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:6px;font-size:0.78rem;display:block;margin:8px auto 16px;max-width:100%;word-break:break-all;color:#f87171;">${errMsg}</code>
-                            <p style="color:var(--text-muted);font-size:0.88rem;max-width:440px;margin:0 auto 24px;line-height:1.8;">${suggestion}</p>
-                            <button class="btn-secondary" onclick="location.reload()"><span class="material-symbols-rounded">refresh</span> ลองใหม่</button>
-                        </div>
-                    `;
-                    ['stat-total','stat-views','stat-romantic','stat-birthday'].forEach(id => {
-                        const el = document.getElementById(id);
-                        el.classList.remove('skeleton'); el.style.height = ''; el.style.width = ''; el.textContent = '—';
-                    });
-                });
-            } catch(err) {
-                console.error('onSnapshot setup error:', err);
-            }
-        }
-
-        function renderStats(data) {
-            const total = data.length;
-            const views = data.reduce((sum, s) => sum + (s.views || 0), 0);
-            const romantic = data.filter(s => s.template === 'romantic').length;
-            const birthday = data.filter(s => s.template === 'birthday').length;
-
-            const setNum = (id, val) => {
-                const el = document.getElementById(id);
-                el.classList.remove('skeleton');
-                el.style.height = '';
-                el.style.width = '';
-                el.textContent = val;
-            };
-            setNum('stat-total', total);
-            setNum('stat-views', views);
-            setNum('stat-romantic', romantic);
-            setNum('stat-birthday', birthday);
-        }
-
-        function renderGrid(data) {
-            const grid = document.getElementById('surprise-grid');
-            if (data.length === 0) {
-                grid.innerHTML = `
-                    <div style="grid-column: 1/-1;">
-                        <div class="empty-state">
-                            <div class="empty-icon">🎁</div>
-                            <div class="empty-title">ยังไม่มีเซอร์ไพรส์</div>
-                            <div class="empty-desc">เริ่มสร้างเซอร์ไพรส์แรกของคุณเลย!</div>
-                            <a href="creator.html" class="btn-primary">
-                                <span class="material-symbols-rounded">add_circle</span> สร้างเลย
-                            </a>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = data.map(s => {
-                const isRomantic = s.template === 'romantic';
-                const badgeClass = isRomantic ? 'badge-romantic' : 'badge-birthday';
-                const badgeLabel = isRomantic ? '💌 Love Letter' : '🎂 Birthday';
-                const privacyIcon = s.privacy === 'once' ? '🔥 ครั้งเดียว' : '🔁 หลายครั้ง';
-                const viewUrl = `view.html?id=${s.id}`;
-                const fullUrl = `${window.location.origin}${window.location.pathname.replace('dashboard.html','')}view.html?id=${s.id}`;
-                const dateStr = s.createdAt ? new Date(s.createdAt.seconds * 1000).toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'2-digit' }) : '';
-
-                return `
-                <div class="surprise-card" id="card-${s.id}">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <span class="card-template-badge ${badgeClass}">${badgeLabel}</span>
-                        <span class="card-privacy">${privacyIcon}</span>
-                    </div>
-                    <div class="card-receiver">ถึง ${escapeHtml(s.receiver)}</div>
-                    <div class="card-message">${escapeHtml(s.message)}</div>
-                    <div class="date-label">📅 ${dateStr} · จาก: ${escapeHtml(s.sender)}</div>
-
-                    <!-- Link Box -->
-                    <div class="card-link-box">
-                        <span class="material-symbols-rounded" style="font-size:0.9rem; color:var(--accent); flex-shrink:0;">link</span>
-                        <input type="text" value="${fullUrl}" readonly id="link-input-${s.id}" onclick="this.select()" title="คลิกเพื่อเลือก">
-                        <button class="card-link-copy" title="คัดลอกลิงก์" id="copy-btn-${s.id}" onclick="copyCardLink('${s.id}')">
-                            <span class="material-symbols-rounded">content_copy</span>
-                        </button>
-                    </div>
-
-                    <div class="card-meta">
-                        <div class="card-views">
-                            <span class="material-symbols-rounded" style="font-size:0.9rem;">visibility</span>
-                            ${s.views || 0} ครั้ง
-                        </div>
-                        <div style="display:flex; gap:8px;">
-                            <a href="${viewUrl}" target="_blank" class="btn-icon" title="เปิดดูเซอร์ไพรส์">
-                                <span class="material-symbols-rounded">open_in_new</span>
-                            </a>
-                            <button class="btn-icon danger" title="ลบ" onclick="confirmDelete('${s.id}')">
-                                <span class="material-symbols-rounded">delete</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                `;
-            }).join('');
-        }
-
-        // Delete
         window.confirmDelete = (id) => {
             deleteTargetId = id;
             document.getElementById('delete-modal').classList.add('active');
         };
         window.closeDeleteModal = () => {
             document.getElementById('delete-modal').classList.remove('active');
-            deleteTargetId = null;
         };
-        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+        document.getElementById('confirm-delete-btn').onclick = async () => {
             if (!deleteTargetId) return;
             try {
                 await deleteDoc(doc(db, 'surprises', deleteTargetId));
-                allSurprises = allSurprises.filter(s => s.id !== deleteTargetId);
-                document.getElementById(`card-${deleteTargetId}`)?.remove();
-                renderStats(allSurprises);
-                showToast('✅ ลบเซอร์ไพรส์แล้ว', 'check_circle');
-            } catch(e) {
-                showToast('❌ ลบไม่สำเร็จ กรุณาลองใหม่', 'error');
+                showToast("✅ ลบเรียบร้อยแล้ว");
+            } catch(e) { 
+                showToast("❌ ไม่สามารถลบได้"); 
             }
             closeDeleteModal();
-        });
+        };
 
-        // Copy link
         window.copyCardLink = async (id) => {
             const url = `${window.location.origin}${window.location.pathname.replace('dashboard.html','')}view.html?id=${id}`;
             try {
