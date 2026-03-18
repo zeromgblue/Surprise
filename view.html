@@ -134,10 +134,14 @@
 
                 if (surpriseData.privacy === 'once' && surpriseData.opened) { showState('burned', 'เซอร์ไพรส์ถูกเปิดแล้ว', 'เซอร์ไพรส์นี้ตั้งค่าให้เปิดได้ครั้งเดียว และถูกเปิดไปแล้ว'); return; }
 
-                // Update views
-                const updates = { views: increment(1) };
-                if (surpriseData.privacy === 'once') updates.opened = true;
-                await updateDoc(docRef, updates);
+                // Update views gracefully
+                try {
+                    const updates = { views: increment(1) };
+                    if (surpriseData.privacy === 'once') updates.opened = true;
+                    await updateDoc(docRef, updates);
+                } catch (updateErr) {
+                    console.warn("Failed to update view count, proceeding anyway.", updateErr);
+                }
 
                 document.title = `เซอร์ไพรส์ถึง ${surpriseData.receiver} | Surprise Me`;
                 showIntro();
@@ -146,8 +150,10 @@
                 showState('error', 'เกิดข้อผิดพลาด', err.message || 'ไม่สามารถโหลดเซอร์ไพรส์ได้ในขณะนี้');
             } finally {
                 const ls = $('loading-screen');
-                ls.classList.add('out');
-                setTimeout(() => ls.remove(), 500);
+                if (ls) {
+                    ls.classList.add('out');
+                    setTimeout(() => ls.remove(), 500);
+                }
             }
         }
 
@@ -171,19 +177,29 @@
             intro.classList.add('show');
         }
 
-        window.openSurprise = () => {
+        window.openSurprise = async () => {
             const intro = $('intro-screen');
             intro.style.transition = 'all 0.35s ease';
             intro.style.opacity = '0';
             intro.style.transform = 'scale(0.95)';
-            setTimeout(() => {
+            setTimeout(async () => {
                 intro.style.display = 'none';
-                renderViewer();
-                setTimeout(() => launchParticles(), 400);
+                
+                // Dynamic Template Engine
+                try {
+                    const module = await import(`./templates/tpl-${tpl.id}.js`);
+                    await module.render($('viewer'), surpriseData, tpl);
+                    $('viewer').classList.add('show');
+                } catch (e) {
+                    // Fallback to classic rendering if custom template JS is not yet created
+                    console.log("Using classic engine:", e.message);
+                    renderClassicViewer();
+                    setTimeout(() => launchParticles(), 400);
+                }
             }, 350);
         };
 
-        function renderViewer() {
+        function renderClassicViewer() {
             const viewer = $('viewer');
             const cardBg = `linear-gradient(160deg, rgba(20,20,20,0.8) 0%, rgba(10,10,10,0.9) 100%)`;
             const cardBorder = `1px solid ${tpl.from}44`;

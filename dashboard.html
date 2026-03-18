@@ -244,6 +244,9 @@
             <a href="creator.html" class="nav-item">
                 <span class="material-symbols-rounded">add_circle</span> สร้างใหม่
             </a>
+            <a href="admin-payments.html" class="nav-item" id="admin-pay-link" style="display:none; color:#F59E0B; background:rgba(245,158,11,0.05); border:1px solid rgba(245,158,11,0.2);">
+                <span class="material-symbols-rounded" style="color:#F59E0B;">payments</span> จัดการการเงิน ฿
+            </a>
             <div class="sidebar-divider"></div>
             <button class="nav-item" onclick="showSection('help')">
                 <span class="material-symbols-rounded">help</span> วิธีใช้งาน
@@ -403,6 +406,11 @@
                 document.getElementById('sidebar-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'U')}&background=FF3366&color=fff`;
                 document.getElementById('sidebar-name').textContent = user.displayName || 'ผู้ใช้';
                 document.getElementById('sidebar-email').textContent = user.email || '';
+
+                // Show admin links if user is admin
+                if (user.uid === 'qqzXIApGiHVh2r78spN1BeZ7Qzz2') {
+                    document.getElementById('admin-pay-link').style.display = 'flex';
+                }
 
                 loadSurprises(user.uid); // Use the real-time listener
             } else {

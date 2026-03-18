@@ -15,7 +15,7 @@
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 24px; z-index: 100;
         }
-        .top-nav .logo { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 6px; text-decoration: none; }
+        .top-nav .logo { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 6px; text-decoration: none; }
         .top-nav .logo .material-symbols-rounded { -webkit-text-fill-color: var(--primary); font-size: 1.2rem; }
 
         .creator-main { max-width: 900px; margin: 0 auto; padding: 88px 20px 60px; }
@@ -80,6 +80,35 @@
         .tpl-card-info { padding: 10px 12px; background: rgba(0,0,0,0.4); }
         .tpl-card-name { font-size: 0.78rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .tpl-card-desc { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Lock Styles */
+        .tpl-lock {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.65); backdrop-filter: blur(2px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 5; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .tpl-card:hover .tpl-lock { opacity: 1; }
+        .tpl-lock .material-symbols-rounded { font-size: 1.5rem; color: #FCD34D; margin-bottom: 4px; }
+        .tpl-lock span { font-size: 0.65rem; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.05em; }
+        .tpl-tier-badge {
+            position: absolute; top: 8px; left: 8px; padding: 2px 8px; border-radius: 4px;
+            font-size: 0.6rem; font-weight: 800; text-transform: uppercase; z-index: 2;
+        }
+        .badge-standard { background: #FF3366; color: white; }
+        .badge-extreme { background: #F59E0B; color: white; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+        }
+        .modal-content {
+            background: #111; border: 1px solid var(--glass-border); border-radius: 24px;
+            max-width: 450px; width: 100%; padding: 32px; text-align: center;
+            animation: modalIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
 
         /* Form */
         .form-section { margin-bottom: 20px; }
@@ -146,6 +175,20 @@
     </nav>
 
     <div class="creator-main">
+        <!-- Tier Indicator -->
+        <div id="tier-banner" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span class="material-symbols-rounded" id="tier-icon" style="color: var(--text-muted); font-size: 2rem;">inventory_2</span>
+                <div>
+                    <h3 id="tier-display-name" style="margin: 0; font-size: 1.1rem;">แพ็กเกจ: ฟรี (Free)</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">กำลังใช้งานคุณสมบัติและเทมเพลตตามแพ็กเกจที่คุณเลือก</p>
+                </div>
+            </div>
+            <a href="showcase.html" class="btn-secondary" style="font-size: 0.85rem; padding: 8px 16px;">
+                <span class="material-symbols-rounded" style="font-size: 1rem;">swap_horiz</span> เปลียนแพ็กเกจ
+            </a>
+        </div>
+
         <!-- Step Indicator -->
         <div style="display:flex; align-items:center; gap: 0; margin-bottom: 36px; flex-wrap: wrap; gap: 8px;">
             <div style="display:flex; align-items:center;">
@@ -161,7 +204,7 @@
         <!-- Step 1: Template Selection -->
         <div class="step-pane active" id="step-1">
             <h1 style="font-size:1.6rem; margin-bottom:6px;">เลือกรูปแบบที่ใช่</h1>
-            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:24px;">มี 20 รูปแบบให้เลือก เหมาะกับทุกโอกาส</p>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:24px;">เทมเพลตเหล่านี้พร้อมให้คุณใช้งานได้ตามแพ็กเกจที่เลือก</p>
             
             <div class="category-chips" id="chips"></div>
             <div class="tpl-grid" id="tpl-grid"></div>
@@ -227,9 +270,14 @@
                 <button class="btn-secondary" onclick="goStep1()" style="padding:10px 20px; font-size:0.9rem;">
                     <span class="material-symbols-rounded">arrow_back</span> กลับ
                 </button>
-                <button class="btn-primary" id="create-btn" onclick="createSurprise()" style="padding:10px 28px; font-size:0.9rem;">
-                    <span class="material-symbols-rounded">magic_button</span> สร้างลิงก์
-                </button>
+                <div style="display:flex;gap:10px;">
+                    <button class="btn-secondary" onclick="previewSurprise()" id="preview-btn" style="padding:10px 20px; font-size:0.9rem; border-color:rgba(255,255,255,0.2);">
+                        <span class="material-symbols-rounded">visibility</span> ดูตัวอย่าง
+                    </button>
+                    <button class="btn-primary" id="create-btn" onclick="createSurprise()" style="padding:10px 28px; font-size:0.9rem;">
+                        <span class="material-symbols-rounded">magic_button</span> สร้างลิงก์
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -277,68 +325,168 @@
         </div>
     </div>
 
+    <!-- Upgrade Modal -->
+    <div class="modal-overlay" id="upgrade-modal">
+        <div class="modal-content">
+            <div style="width:64px; height:64px; background:rgba(252,211,77,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;">
+                <span class="material-symbols-rounded" style="color:#FCD34D; font-size:2rem;">lock</span>
+            </div>
+            <h2 id="modal-title" style="margin-bottom:12px;">อัปเกรดเพื่อปลดล็อก</h2>
+            <p id="modal-text" style="color:var(--text-muted); font-size:0.9rem; line-height:1.6; margin-bottom:28px;">
+                เทมเพลตนี้เป็นส่วนหนึ่งของ <span id="tier-name" style="color:white; font-weight:700;">พรีเมียมแพ็กเกจ</span><br>
+                จ่ายเพียงครั้งเดียวเพื่อใช้งานได้ตลอดไป
+            </p>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <button class="btn-primary" onclick="window.location.href='showcase.html'" style="justify-content:center;">ดูแพ็กเกจทั้งหมด</button>
+                <button class="btn-secondary" onclick="closeModal()" style="justify-content:center; border:none; background:transparent;">ไว้ครั้งหน้า</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
-        import { auth, db, googleProvider } from './firebase-config.js';
+        import { auth, db } from './firebase-config.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-        import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+        import { collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
         import { TEMPLATES, CATEGORIES } from './templates-data.js';
 
         let selectedTemplateId = null;
         let selectedPrivacy = 'multi';
         let currentUser = null;
+        let userTier = 'free'; // Default state before DB check
+        const urlParams = new URLSearchParams(window.location.search);
 
-        // Auth
-        onAuthStateChanged(auth, user => {
+        // Auth & Tier Management
+        onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             const navUser = document.getElementById('nav-user');
+            
             if (user) {
                 navUser.innerHTML = `
                     <a href="dashboard.html" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:white; font-size:0.85rem; font-weight:500;">
                         <img src="${user.photoURL||''}" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--primary);" alt="">
                         <span style="max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${user.displayName||user.email}</span>
                     </a>`;
+                
+                // --- BACKEND CHECK: Fetch tier from Firestore ---
+                if (user.uid === 'qqzXIApGiHVh2r78spN1BeZ7Qzz2') {
+                    userTier = 'extreme'; // Admin bypass for review
+                    console.log("Welcome Admin! Access granted.");
+                } else {
+                    try {
+                        const userDoc = await getDoc(doc(db, 'users', user.uid));
+                        if (userDoc.exists()) {
+                            userTier = userDoc.data().tier || 'free';
+                        }
+                    } catch (e) { console.error("Error fetching tier:", e); }
+                }
             } else {
                 navUser.innerHTML = `<a href="index.html" class="btn-secondary" style="padding:6px 14px;font-size:0.82rem;">กลับหน้าหลัก</a>`;
+                userTier = 'free';
             }
+
+            // Sync UI with the fetched tier
+            updateTierUI(userTier);
+            renderChips();
+            renderGrid();
         });
 
-        // Build category chips
-        const chipsEl = document.getElementById('chips');
-        CATEGORIES.forEach(cat => {
-            const chip = document.createElement('button');
-            chip.className = 'chip' + (cat.id === 'all' ? ' active' : '');
-            chip.textContent = cat.label;
-            chip.dataset.cat = cat.id;
-            chip.addEventListener('click', () => {
-                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-                chip.classList.add('active');
-                renderGrid(cat.id);
+        // Build category chips dynamically based on what's available for Current User Tier
+        function renderChips() {
+            const chipsEl = document.getElementById('chips');
+            chipsEl.innerHTML = ''; // Clear existing chips
+
+            const available = TEMPLATES.filter(t => hasAccess(t.tier, userTier));
+            const usedCategories = new Set(available.map(t => t.category));
+
+            CATEGORIES.forEach(cat => {
+                if (cat.id !== 'all' && !usedCategories.has(cat.id)) return;
+                
+                const chip = document.createElement('button');
+                chip.className = 'chip' + (cat.id === 'all' ? ' active' : '');
+                chip.textContent = cat.label;
+                chip.dataset.cat = cat.id;
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    renderGrid(cat.id);
+                });
+                chipsEl.appendChild(chip);
             });
-            chipsEl.appendChild(chip);
-        });
+        }
 
-        // Build template grid
+        function updateTierUI(tier) {
+            const bannerEl = document.getElementById('tier-banner');
+            const iconEl = document.getElementById('tier-icon');
+            const nameEl = document.getElementById('tier-display-name');
+            
+            if(tier === 'extreme' || tier === 'premium') {
+                bannerEl.style.background = 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(239,68,68,0.1))';
+                bannerEl.style.borderColor = 'rgba(245,158,11,0.3)';
+                iconEl.textContent = 'diamond';
+                iconEl.style.color = '#F59E0B';
+                nameEl.textContent = 'แพ็กเกจ: EXTREME (120 บาท)';
+                nameEl.style.color = '#F59E0B';
+            } else if(tier === 'standard') {
+                bannerEl.style.background = 'linear-gradient(135deg, rgba(255,51,102,0.1), rgba(147,51,234,0.1))';
+                bannerEl.style.borderColor = 'rgba(255,51,102,0.3)';
+                iconEl.textContent = 'star';
+                iconEl.style.color = '#FF3366';
+                nameEl.textContent = 'แพ็กเกจ: STANDARD (20 บาท)';
+                nameEl.style.color = '#FF3366';
+            } else {
+                bannerEl.style.background = 'rgba(255,255,255,0.03)';
+                bannerEl.style.borderColor = 'rgba(255,255,255,0.08)';
+                iconEl.textContent = 'potted_plant';
+                iconEl.style.color = 'var(--text-muted)';
+                nameEl.textContent = 'แพ็กเกจ: ฟรี (Free)';
+                nameEl.style.color = 'var(--text-muted)';
+            }
+        }
+
+        // Helper func to check access
+        function hasAccess(tplTier, tier) {
+            if (tier === 'extreme' || tier === 'premium') return tplTier === 'premium' || tplTier === 'standard' || tplTier === 'free';
+            if (tier === 'standard') return tplTier === 'standard' || tplTier === 'free';
+            return tplTier === 'free';
+        }
+
+
+        // Build template grid based on fetched tier
         function renderGrid(filterCat = 'all') {
             const grid = document.getElementById('tpl-grid');
-            const filtered = filterCat === 'all' ? TEMPLATES : TEMPLATES.filter(t => t.category === filterCat);
-            grid.innerHTML = filtered.map(t => `
-                <div class="tpl-card ${selectedTemplateId === t.id ? 'selected' : ''}" id="tcard-${t.id}" onclick="selectTpl('${t.id}')">
-                    <div class="tpl-card-preview" style="background:linear-gradient(135deg,${t.from}22,${t.to}33); border-bottom: 1px solid rgba(255,255,255,0.05);">
-                        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,${t.from},${t.to});display:flex;align-items:center;justify-content:center;">
-                            <span class="material-symbols-rounded" style="color:white;font-variation-settings:'FILL' 1;font-size:1.4rem;">${t.icon}</span>
+            
+            // Filter by access rights so users only see what their package allows
+            const filtered = TEMPLATES.filter(t => {
+                const matchesTier = hasAccess(t.tier, userTier);
+                const matchesCat = filterCat === 'all' || t.category === filterCat;
+                return matchesTier && matchesCat;
+            });
+
+            grid.innerHTML = filtered.map(t => {
+                return `
+                    <div class="tpl-card ${selectedTemplateId === t.id ? 'selected' : ''}" id="tcard-${t.id}" onclick="selectTpl('${t.id}')">
+                        <div class="tpl-card-preview" style="background:linear-gradient(135deg,${t.from}22,${t.to}33); border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,${t.from},${t.to});display:flex;align-items:center;justify-content:center;">
+                                <span class="material-symbols-rounded" style="color:white;font-variation-settings:'FILL' 1;font-size:1.4rem;">${t.icon}</span>
+                            </div>
+                        </div>
+                        <div class="tpl-card-check"><span class="material-symbols-rounded">check</span></div>
+                        <div class="tpl-card-info">
+                            <div class="tpl-card-name">${t.nameTh}</div>
+                            <div class="tpl-card-desc">${t.desc}</div>
                         </div>
                     </div>
-                    <div class="tpl-card-check"><span class="material-symbols-rounded">check</span></div>
-                    <div class="tpl-card-info">
-                        <div class="tpl-card-name">${t.nameTh}</div>
-                        <div class="tpl-card-desc">${t.desc}</div>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">ไม่มีเทมเพลตในหมวดหมู่นี้สำหรับแพ็กเกจที่คุณเลือก</div>`;
+            }
         }
         renderGrid();
 
         window.selectTpl = (id) => {
+
             selectedTemplateId = id;
             document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('selected'));
             const card = document.getElementById('tcard-' + id);
@@ -348,8 +496,18 @@
             btn.style.opacity = '1';
         };
 
-        // Check URL params
-        const urlParams = new URLSearchParams(window.location.search);
+        function showUpgradeModal(tier) {
+            const modal = document.getElementById('upgrade-modal');
+            const tierName = document.getElementById('tier-name');
+            tierName.textContent = tier === 'standard' ? 'Standard (20 บาท)' : 'Extreme (120 บาท)';
+            modal.style.display = 'flex';
+        }
+
+        window.closeModal = () => {
+            document.getElementById('upgrade-modal').style.display = 'none';
+        }
+
+
         const tFromUrl = urlParams.get('t');
         if (tFromUrl && TEMPLATES.find(t => t.id === tFromUrl)) {
             selectTpl(tFromUrl);
@@ -419,8 +577,8 @@
                     uid: currentUser?.uid || null,
                     ownerName: currentUser?.displayName || null,
                 });
-                const base = window.location.href.replace('creator.html', '');
-                const viewUrl = `${base}view.html?id=${docRef.id}`;
+                const baseUrl = window.location.href.split('creator.html')[0];
+                const viewUrl = `${baseUrl}view.html?id=${docRef.id}`;
                 document.getElementById('generated-link').value = viewUrl;
                 document.getElementById('preview-final-btn').href = viewUrl;
                 // Show localhost warning if needed
@@ -445,6 +603,22 @@
                 btn.innerHTML = '<span class="material-symbols-rounded">check</span>';
                 setTimeout(() => { btn.innerHTML = '<span class="material-symbols-rounded">content_copy</span>'; }, 2000);
             } catch { document.getElementById('generated-link').select(); }
+        };
+
+        window.previewSurprise = () => {
+            const receiver = document.getElementById('receiver-name').value.trim() || 'ผู้รับ';
+            const message  = document.getElementById('message-text').value.trim()  || 'ข้อความของคุณจะแสดงที่นี่...';
+            const sender   = document.getElementById('sender-name').value.trim()   || 'ผู้ส่ง';
+            const privacy  = selectedPrivacy || 'multi';
+            const params = new URLSearchParams({
+                tpl: selectedTemplateId,
+                receiver: encodeURIComponent(receiver),
+                message:  encodeURIComponent(message),
+                sender:   encodeURIComponent(sender),
+                privacy,
+                tier: userTier,
+            });
+            window.open('preview.html?' + params.toString(), '_blank');
         };
 
         window.resetCreator = () => {
