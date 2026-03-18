@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ชำระเงิน | Surprise Me</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="dns-prefetch" href="https://www.gstatic.com">
+    <link rel="dns-prefetch" href="https://firestore.googleapis.com">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
@@ -33,7 +38,7 @@
         .step-dot.done { background:rgba(255,255,255,0.4); }
 
         /* Cards */
-        .pay-card { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:28px;margin-bottom:16px; }
+        .pay-card { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:28px;margin-bottom:16px; position: relative; }
         .pay-card-title { font-weight:700;font-size:1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px; }
         .pay-card-title .material-symbols-rounded { color:#FF3366;font-size:1.1rem;font-variation-settings:'FILL' 1; }
 
@@ -49,33 +54,12 @@
             display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
         }
         .qr-to { color:#111;font-size:0.85rem;font-weight:600;text-align:center; }
-        .qr-account { color:#374151;font-size:1.1rem;font-weight:700;letter-spacing:2px; }
-        .qr-name { color:#6b7280;font-size:0.8rem; }
         .qr-amount-label { 
             display:inline-flex;align-items:center;gap:6px;
             background:linear-gradient(135deg,#FF3366,#9333EA);
             color:white;padding:6px 16px;border-radius:50px;
             font-size:1rem;font-weight:700;
         }
-
-        /* Bank info fallback */
-        .bank-info { display:flex;align-items:center;gap:12px;padding:16px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid rgba(255,255,255,0.06); }
-        .bank-icon { width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem; }
-        .bank-text-name { font-weight:600;font-size:0.9rem; }
-        .bank-text-num { color:var(--text-muted);font-size:0.82rem;letter-spacing:1px; }
-
-        /* Upload area */
-        .upload-area {
-            border:2px dashed rgba(255,255,255,0.15);border-radius:16px;
-            padding:30px;text-align:center;cursor:pointer;
-            transition:all 0.3s ease;position:relative;overflow:hidden;
-        }
-        .upload-area:hover,.upload-area.drag { border-color:#FF3366;background:rgba(255,51,102,0.05); }
-        .upload-area input { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
-        .upload-icon { font-size:2.5rem;color:var(--text-muted);margin-bottom:10px; }
-        .upload-text { color:var(--text-muted);font-size:0.9rem; }
-        .upload-text strong { color:white; }
-        .upload-preview { width:100%;border-radius:12px;max-height:300px;object-fit:contain;display:none; }
 
         /* Form fields */
         .pay-input { width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:white;font-size:0.9rem;font-family:'Inter',sans-serif;box-sizing:border-box;outline:none;transition:border-color 0.2s; }
@@ -94,18 +78,25 @@
         .pay-submit-btn:hover:not(:disabled) { transform:translateY(-2px);box-shadow:0 8px 40px rgba(255,51,102,0.6); }
         .pay-submit-btn:disabled { opacity:0.5;cursor:not-allowed; }
 
-        /* Feature list */
-        .feature-list { list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px; }
-        .feature-list li { display:flex;align-items:center;gap:10px;font-size:0.9rem;color:rgba(255,255,255,0.8); }
-        .feature-list li .material-symbols-rounded { font-size:1rem;color:#4ade80;font-variation-settings:'FILL' 1; }
-
         /* Success screen */
-        #success-screen { display:none;text-align:center;padding:60px 20px; }
+        #success-screen { display:none;text-align:center;padding:40px 20px; }
         #success-screen.show { display:block;animation:fadeInUp 0.6s ease; }
         .success-ring { width:80px;height:80px;border-radius:50%;background:rgba(74,222,128,0.1);border:2px solid rgba(74,222,128,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 24px; }
+        
+        .id-badge {
+            background: rgba(255,255,255,0.07);
+            border: 1px dashed rgba(255,255,255,0.2);
+            padding: 16px; border-radius: 16px;
+            margin: 20px 0; position: relative;
+        }
+        .id-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; display: block; }
+        .id-value { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--primary); letter-spacing: 2px; }
 
-        /* Timer */
-        .timer-badge { display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:6px 14px;border-radius:50px;font-size:0.8rem;color:var(--text-muted);margin-top:12px; }
+        .contact-box {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.1), rgba(107, 33, 168, 0.1));
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            padding: 20px; border-radius: 16px; margin-top: 24px; text-align: left;
+        }
 
         @keyframes fadeInUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
         
@@ -126,15 +117,9 @@
             border-top: 4px solid #FF3366;
             animation: spin 1s linear infinite;
         }
-        .loader-ring .material-symbols-rounded {
-            font-size: 2rem; color: #FF3366;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
         #loading-text { font-weight: 700; font-size: 1.2rem; color: white; text-align: center; }
-        #loading-sub { color: var(--text-muted); font-size: 0.85rem; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -142,11 +127,11 @@
     <!-- Loading Overlay -->
     <div id="loading-overlay">
         <div class="loader-ring">
-            <span class="material-symbols-rounded">receipt_long</span>
+            <span class="material-symbols-rounded">shopping_cart_checkout</span>
         </div>
-        <div id="loading-text">กำลังประมวลผล...</div>
-        <div id="loading-sub">กรุณารอสักครู่ ระบบกำลังส่งหลักฐานการโอน</div>
+        <div id="loading-text">กำลังออกเลข ID สินค้า...</div>
     </div>
+
     <div class="pay-wrap">
         <!-- Header -->
         <div class="pay-header">
@@ -162,22 +147,20 @@
             <div class="pay-desc" id="tier-desc">ปลดล็อก 30 เทมเพลตพรีเมียม สวยแบบมีสไตล์</div>
         </div>
 
-        <!-- Steps -->
-        <div class="steps">
-            <div class="step-dot active" id="dot-1"></div>
-            <div class="step-dot" id="dot-2"></div>
-            <div class="step-dot" id="dot-3"></div>
-        </div>
-
         <!-- Payment Form -->
         <div id="pay-form">
-            <!-- Features -->
-            <div class="pay-card">
-                <div class="pay-card-title"><span class="material-symbols-rounded">inventory_2</span> คุณจะได้รับ</div>
-                <ul class="feature-list" id="feature-list"></ul>
+            <!-- Instructions Card -->
+            <div class="pay-card" style="border-color: rgba(74, 222, 128, 0.3); background: rgba(74, 222, 128, 0.03);">
+                <div class="pay-card-title" style="color:#4ade80;"><span class="material-symbols-rounded">info</span> ขั้นตอนการสั่งซื้อ</div>
+                <div style="font-size:0.85rem; color:white; line-height:1.7;">
+                    1. ชำระเงินผ่าน TrueMoney Wallet <br>
+                    2. กรอกชื่อและกดปุ่มด้านล่างเพื่อ <b>รับเลข ID สินค้า</b> <br>
+                    3. ทักไปที่ <b style="color:var(--primary);">IG : zerostudio0.1</b> พร้อมแจ้งเลข ID <br>
+                    4. แอดมินจะกดอนุมัติให้ทันทีที่ได้รับข้อความครับ
+                </div>
             </div>
 
-            <!-- TrueMoney Wallet Payment -->
+            <!-- TrueMoney Wallet -->
             <div class="pay-card">
                 <div class="pay-card-title" style="color:#FF6600;">
                     <span style="font-size:1.3rem;">🧡</span> TrueMoney Wallet
@@ -191,65 +174,32 @@
                     </div>
                     <div class="qr-to" style="color:#333;">โอนเงินมาที่เบอร์</div>
                     <div style="color:#FF6600;font-size:1.4rem;font-weight:800;letter-spacing:3px;" id="qr-phone">0800823401</div>
-                    <div class="qr-name" id="qr-name" style="color:#888;">TrueMoney Wallet</div>
                     <div style="background:#FF6600;color:white;padding:6px 20px;border-radius:50px;font-size:1rem;font-weight:700;">
                         ฿<span id="qr-amount-lbl">20</span> บาท
                     </div>
                 </div>
-
-                <!-- Steps to pay -->
-                <div style="margin-top:16px;padding:14px;background:rgba(255,102,0,0.07);border:1px solid rgba(255,102,0,0.2);border-radius:12px;">
-                    <div style="font-size:0.82rem;font-weight:700;color:#FF6600;margin-bottom:10px;">วิธีโอนผ่าน TrueMoney</div>
-                    <div style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.8;">
-                        1. เปิดแอป TrueMoney Wallet<br>
-                        2. กด <strong style="color:white;">โอนเงิน</strong> → เข้าแอพ TrueMoney<br>
-                        3. ค้นหาเบอร์ <strong style="color:#FF6600;">080-082-3401</strong><br>
-                        4. ใส่จำนวนเงิน แล้วกดยืนยัน<br>
-                        5. ถ่ายรูปสลิปและอัปโหลดด้านล่าง
-                    </div>
-                </div>
             </div>
 
-            <!-- Upload Slip -->
+            <!-- User Info -->
             <div class="pay-card">
-                <div class="pay-card-title"><span class="material-symbols-rounded">receipt_long</span> แนบสลิปการโอน</div>
-                <div class="upload-area" id="uploadArea">
-                    <input type="file" id="slipInput" accept="image/*">
-                    <div class="upload-icon">
-                        <span class="material-symbols-rounded" style="font-size:2.5rem;color:rgba(255,255,255,0.3);">upload_file</span>
-                    </div>
-                    <div class="upload-text"><strong>คลิกหรือลากรูปมาวาง</strong><br>รองรับ JPG, PNG, HEIC (สูงสุด 5 MB)</div>
-                    <img id="slipPreview" class="upload-preview" alt="Slip">
-                </div>
-            </div>
-
-            <!-- Contact -->
-            <div class="pay-card">
-                <div class="pay-card-title"><span class="material-symbols-rounded">contact_mail</span> ข้อมูลของคุณ</div>
+                <div class="pay-card-title"><span class="material-symbols-rounded">person</span> ข้อมูลของคุณ</div>
                 <div style="display:flex;flex-direction:column;gap:14px;">
                     <div>
-                        <label class="pay-label">ชื่อ / LINE ID / เบอร์โทร *</label>
-                        <input type="text" class="pay-input" id="pay-contact" placeholder="เช่น สมชาย หรือ @somchai">
-                    </div>
-                    <div>
-                        <label class="pay-label">จำนวนเงินที่โอน *</label>
-                        <input type="number" class="pay-input" id="pay-amount-input" placeholder="ระบุจำนวนเงิน">
+                        <label class="pay-label">ชื่อ / นามแฝงของคุณ *</label>
+                        <input type="text" class="pay-input" id="pay-contact" placeholder="เช่น สมชาย">
                     </div>
                     <div>
                         <label class="pay-label">หมายเหตุ (ถ้ามี)</label>
-                        <input type="text" class="pay-input" id="pay-note" placeholder="เช่น โอนเมื่อ 10:30 น.">
+                        <input type="text" class="pay-input" id="pay-note" placeholder="เช่น จ่ายตอน 12:30 น.">
                     </div>
                 </div>
             </div>
 
             <!-- Submit -->
             <button class="pay-submit-btn" id="submitBtn">
-                <span class="material-symbols-rounded">send</span>
-                ส่งหลักฐานการชำระเงิน
+                <span class="material-symbols-rounded">shopping_cart</span>
+                ชำระเงินเรียบร้อยแล้ว — ขอรับเลข ID สั่งซื้อ
             </button>
-            <p style="text-align:center;color:var(--text-muted);font-size:0.8rem;margin-top:12px;">
-                ทีมงานจะตรวจสอบและเปิดสิทธิ์ภายใน <strong style="color:white;">1–24 ชั่วโมง</strong> 🕐
-            </p>
         </div>
 
         <!-- Success Screen -->
@@ -257,270 +207,102 @@
             <div class="success-ring">
                 <span class="material-symbols-rounded" style="font-size:2.5rem;color:#4ade80;font-variation-settings:'FILL' 1;">check_circle</span>
             </div>
-            <h2 style="font-size:1.6rem;margin-bottom:8px;">ส่งสลิปเรียบร้อยแล้ว!</h2>
-            <p style="color:var(--text-muted);line-height:1.8;max-width:360px;margin:0 auto 24px;">
-                ทีมงานจะตรวจสอบการโอนเงินและ<strong style="color:white;">เปิดสิทธิ์ใช้งาน</strong>ให้คุณภายใน 1–24 ชั่วโมง<br>
-                ขอบคุณที่ใช้บริการ Surprise Me! 💜
-            </p>
-            <div class="timer-badge">
-                <span class="material-symbols-rounded" style="font-size:0.9rem;">schedule</span>
-                หมายเลขอ้างอิง: <strong id="ref-id" style="color:white;"></strong>
+            <h2 style="font-size:1.6rem;margin-bottom:8px;">คำสั่งซื้อถูกบันทึกแล้ว!</h2>
+            <p style="color:var(--text-muted);font-size:0.9rem;">กรุณา <b style="color:white;">แคปหน้าจอนี้</b> หรือจดจำเลข ID ด้านล่างไว้</p>
+
+            <div class="id-badge">
+                <span class="id-label">เลข ID สินค้าของคุณ (ORDER ID)</span>
+                <div class="id-value" id="final-id">LOADING...</div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:12px;margin-top:30px;">
-                <a href="creator.html" class="btn-primary" style="text-align:center;padding:14px;">
-                    <span class="material-symbols-rounded">edit_note</span> ไปสร้าง Surprise (ฟรี) ก่อนได้เลย
+
+            <div class="contact-box">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                    <span class="material-symbols-rounded" style="color:var(--primary);">contact_support</span>
+                    <strong style="color:white;">ขั้นตอนสุดท้าย:</strong>
+                </div>
+                <div style="font-size:0.88rem; color:rgba(255,255,255,0.8); line-height:1.6;">
+                    ส่งเลข ID นี้ไปที่ <b style="color:#FF3366;">IG: zerostudio0.1</b> <br>
+                    เพื่อให้แอดมินทำการเปิดระบบให้คุณทันทีครับ
+                </div>
+                <a href="https://www.instagram.com/zerostudio0.1/" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:8px; background:white; color:black; padding:12px; border-radius:12px; margin-top:20px; text-decoration:none; font-weight:700; font-size:0.9rem;">
+                    ส่งข้อความทาง IG ทันที
                 </a>
-                <a href="index.html" class="btn-secondary" style="text-align:center;padding:12px;">
-                    <span class="material-symbols-rounded">home</span> กลับหน้าหลัก
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;margin-top:30px;">
+                <a href="dashboard.html" class="btn-secondary" style="text-align:center;padding:12px; border-color:rgba(255,255,255,0.1);">
+                    <span class="material-symbols-rounded">dashboard</span> ไปที่ Dashboard
                 </a>
             </div>
         </div>
     </div>
 
     <script type="module">
-        // ============================================================
-        // ⚙️ CONFIG TrueMoney Wallet
-        // ============================================================
-        const CONFIG = {
-            truemoneyPhone: '0800823401',   // เบอร์ TrueMoney Wallet
-            accountName:    'ธนบดี จันทร์ดา',  // ชื่อบัญชีของคุณ
-        };
-        // ============================================================
-
-        import { auth, db, storage } from './firebase-config.js';
+        import { auth, db } from './firebase-config.js';
         import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
         const params = new URLSearchParams(window.location.search);
         const tier = params.get('tier') || 'standard';
-
         let currentUser = null;
-        let slipFile = null;
 
         onAuthStateChanged(auth, u => { currentUser = u; });
 
-        // Tier config
         const tiers = {
-            standard: {
-                label: 'Standard Package',
-                icon: 'star',
-                badgeClass: 'badge-std',
-                amount: 20,
-                desc: 'ปลดล็อก 30 เทมเพลตพรีเมียม สวยแบบมีสไตล์',
-                features: [
-                    '30 เทมเพลตสุดพิเศษ ครบทุกเทศกาล',
-                    'Canvas 2D อนิเมชั่นสวยงาม',
-                    'ส่งให้แฟน เพื่อน ครอบครัวได้ไม่จำกัด',
-                    'ลิงก์ไม่มีวันหมดอายุ',
-                ],
-            },
-            extreme: {
-                label: 'EXTREME Package',
-                icon: 'diamond',
-                badgeClass: 'badge-ext',
-                amount: 120,
-                desc: 'ปลดล็อก 100+ เทมเพลต Premium 3D สุดอลังการ',
-                features: [
-                    '100+ เทมเพลต Premium ทั้ง 10 หมวด',
-                    'อวกาศ 3D, เวทมนตร์, มินิเกม, Cinematic',
-                    'ธรรมชาติ, แลนด์มาร์ก, Fluid Art, เทศกาล, VIP',
-                    'สิทธิ์ตลอดชีพ — อัปเดตฟรีตลอดเวลา',
-                ],
-            },
+            standard: { label: 'Standard Package', icon: 'star', badgeClass: 'badge-std', amount: 20, desc: 'ปลดล็อก 30+ เทมเพลตพรีเมียม สวยมีสไตล์' },
+            extreme:  { label: 'EXTREME Package',  icon: 'diamond', badgeClass: 'badge-ext', amount: 120, desc: 'ปลดล็อก 100+ เทมเพลต 3D และ VIP ทั้งหมด' }
         };
-
         const t = tiers[tier] || tiers.standard;
 
-        // --- Render tier info ---
         document.getElementById('tier-icon').textContent = t.icon;
         document.getElementById('tier-label').textContent = t.label;
         document.getElementById('tier-badge').className = 'pay-tier-badge ' + t.badgeClass;
         document.getElementById('amount-num').textContent = t.amount;
         document.getElementById('tier-desc').textContent = t.desc;
-        document.getElementById('pay-amount-input').value = t.amount;
         document.getElementById('qr-amount-lbl').textContent = t.amount;
 
-        // Feature list
-        const fl = document.getElementById('feature-list');
-        t.features.forEach(f => {
-            fl.innerHTML += `<li><span class="material-symbols-rounded">check_circle</span>${f}</li>`;
-        });
-
-        // Account info — TrueMoney
-        document.getElementById('qr-phone').textContent = CONFIG.truemoneyPhone;
-        document.getElementById('qr-name').textContent = CONFIG.accountName;
-
-        // Use real QR image from images folder
         const qrImg = document.getElementById('qr-img');
         const qrPh  = document.getElementById('qr-placeholder');
         qrImg.onload = () => { qrImg.style.display='block'; qrPh.style.display='none'; };
-        qrImg.onerror = () => { qrPh.innerHTML = `<span style="font-size:2rem;">🧡</span><span style="color:#6b7280;font-size:0.8rem;">สแกนผ่าน TrueMoney App</span>`; };
         qrImg.src = './images/truemoney_qr.png';
 
-        // --- Slip upload ---
-        const slipInput = document.getElementById('slipInput');
-        const slipPreview = document.getElementById('slipPreview');
-        const uploadArea = document.getElementById('uploadArea');
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.addEventListener('click', async () => {
+            const contact = document.getElementById('pay-contact').value.trim();
+            if (!contact) { alert('กรุณาระบุชื่อของคุณ'); return; }
 
-        slipInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (file.size > 5 * 1024 * 1024) { alert('ไฟล์ใหญ่เกิน 5 MB'); return; }
-            slipFile = file;
-            const reader = new FileReader();
-            reader.onload = ev => {
-                slipPreview.src = ev.target.result;
-                slipPreview.style.display = 'block';
-                uploadArea.querySelector('.upload-icon').style.display = 'none';
-                uploadArea.querySelector('.upload-text').style.display = 'none';
-            };
-            reader.readAsDataURL(file);
-        });
+            const overlay = document.getElementById('loading-overlay');
+            submitBtn.disabled = true;
+            overlay.style.display = 'flex';
 
-        // Drag & drop
-        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag'); });
-        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag'));
-        uploadArea.addEventListener('drop', e => {
-            e.preventDefault(); uploadArea.classList.remove('drag');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) {
-                slipInput.files = e.dataTransfer.files;
-                slipInput.dispatchEvent(new Event('change'));
+            try {
+                const docRef = await addDoc(collection(db, 'payments'), {
+                    tier: tier,
+                    amount: t.amount,
+                    contact: contact,
+                    note: document.getElementById('pay-note').value.trim(),
+                    status: 'pending',
+                    uid: currentUser?.uid || null,
+                    userEmail: currentUser?.email || null,
+                    createdAt: serverTimestamp(),
+                    method: 'contact_ig'
+                });
+
+                overlay.style.display = 'none';
+                document.getElementById('pay-form').style.display = 'none';
+                document.getElementById('success-screen').classList.add('show');
+                
+                // Show a clear ID (Firestore Doc ID is unique and consistent)
+                const finalId = docRef.id.substring(0, 10).toUpperCase();
+                document.getElementById('final-id').textContent = finalId;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (err) {
+                overlay.style.display = 'none';
+                alert('เกิดข้อผิดพลาด: ' + err.message);
+                submitBtn.disabled = false;
             }
         });
-
-        // Helper: Compress image before upload
-        async function compressImage(file, maxWidth = 1000, quality = 0.6) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height = Math.round((maxWidth / width) * height);
-                            width = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        canvas.toBlob((blob) => {
-                            if (blob) resolve(blob);
-                            else reject(new Error("Compression failed"));
-                        }, 'image/jpeg', quality);
-                    };
-                    img.onerror = reject;
-                };
-                reader.onerror = reject;
-            });
-        }
-
-        // --- Submit ---
-        const submitBtn = document.getElementById('submitBtn');
-        if (submitBtn) {
-            submitBtn.addEventListener('click', async () => {
-                console.log("Submit clicked");
-                const contactInput = document.getElementById('pay-contact');
-                const amountInput  = document.getElementById('pay-amount-input');
-                const noteInput    = document.getElementById('pay-note');
-
-                const contact = contactInput.value.trim();
-                const amount  = amountInput.value.trim();
-
-                if (!contact) { contactInput.focus(); alert('กรุณากรอกชื่อหรือ LINE ID สำหรับการติดต่อกลับ'); return; }
-                if (!slipFile) { alert('กรุณาแนบรูปภาพสลิปการโอนเงินเพื่อตรวจสอบ'); return; }
-                if (!amount) { amountInput.focus(); alert('กรุณาระบุจำนวนเงินที่โอน'); return; }
-
-                // Loading state
-                const overlay = document.getElementById('loading-overlay');
-                const loadText = document.getElementById('loading-text');
-                const loadSub  = document.getElementById('loading-sub');
-
-                submitBtn.disabled = true;
-                overlay.style.display = 'flex';
-                loadText.textContent = "กำลังเริ่มกระบวนการ...";
-
-                try {
-                    let slipUrl = null;
-                    let fileToUpload = slipFile;
-
-                    // 1. Compress Image
-                    loadText.textContent = "กำลังปรับปรุงความละเอียดรูปภาพ...";
-                    loadSub.textContent = "เพื่อให้ส่งสลิปได้รวดเร็วขึ้น";
-                    try {
-                        fileToUpload = await compressImage(slipFile);
-                    } catch (compErr) {
-                        console.warn("Compression failed, using original file", compErr);
-                        fileToUpload = slipFile;
-                    }
-                    
-                    // 2. Upload to Firebase Storage
-                    loadText.textContent = "กำลังอัปโหลดสลิป...";
-                    loadSub.textContent = "กรุณาอย่าปิดหน้านี้ กำลังคุยกับเซิร์ฟเวอร์";
-                    
-                    const fileName = `${Date.now()}_${currentUser?.uid || 'anon'}_slip.jpg`;
-                    const storageRef = ref(storage, `payment-slips/${fileName}`);
-                    
-                    try {
-                        const uploadTask = uploadBytes(storageRef, fileToUpload);
-                        const uploadPromise = uploadTask.then(async (snap) => {
-                            return await getDownloadURL(snap.ref);
-                        });
-
-                        const timeoutPromise = new Promise((_, reject) => 
-                            setTimeout(() => reject(new Error("การเชื่อมต่อล่าช้าเกินไป กรุณาลองใหม่อีกครั้ง")), 60000)
-                        );
-
-                        slipUrl = await Promise.race([uploadPromise, timeoutPromise]);
-                    } catch(storageErr) {
-                        console.error('Storage Error:', storageErr);
-                        throw new Error('ไม่สามารถอัปโหลดสลิปได้ (ตรวจสอบสัญญาณอินเทอร์เน็ต)');
-                    }
-
-                    if (!slipUrl) throw new Error('เกิดความผิดพลาดในการขอ URL ของรูปภาพ');
-
-                    // 3. Save to Firestore
-                    loadText.textContent = "กำลังส่งข้อมูลยืนยัน...";
-                    loadSub.textContent = "บันทึกประวัติการโอนเงินลงระบบ";
-
-                    const docData = {
-                        tier: tier,
-                        amount: parseFloat(amount) || t.amount,
-                        contact: contact,
-                        note: document.getElementById('pay-note').value.trim(),
-                        slipUrl: slipUrl,
-                        uid: currentUser?.uid || null,
-                        userEmail: currentUser?.email || null,
-                        status: 'pending',
-                        createdAt: serverTimestamp(),
-                        uploadHandled: true
-                    };
-
-                    const docRef = await addDoc(collection(db, 'payments'), docData);
-
-                    // 4. Success
-                    overlay.style.display = 'none';
-                    document.getElementById('pay-form').style.display = 'none';
-                    
-                    const successScreen = document.getElementById('success-screen');
-                    successScreen.classList.add('show');
-                    document.getElementById('ref-id').textContent = docRef.id.substring(0, 8).toUpperCase();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                } catch(err) {
-                    overlay.style.display = 'none';
-                    console.error('Final Submission Error:', err);
-                    alert('ไม่สามารถส่งข้อมูลได้: ' + (err.message || 'เครือข่ายขัดข้อง'));
-                    submitBtn.disabled = false;
-                }
-            });
-        }
     </script>
 </body>
 </html>

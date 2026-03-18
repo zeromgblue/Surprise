@@ -133,6 +133,14 @@
             </div>
         </div>
 
+        <!-- Search -->
+        <div style="margin-bottom:20px; position:relative;">
+            <span class="material-symbols-rounded" style="position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:1.2rem;">search</span>
+            <input type="text" id="idSearch" placeholder="ค้นหาด้วย ID สินค้า (10 หลัก)..." 
+                   oninput="handleSearch()"
+                   style="width:100%; padding:14px 14px 14px 48px; border-radius:16px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:white; font-size:0.95rem; outline:none; transition:border-color 0.2s; box-sizing:border-box;">
+        </div>
+
         <!-- Filters -->
         <div class="filter-row">
             <button class="filter-btn active" onclick="filterPayments('all', this)">ทั้งหมด</button>
@@ -166,6 +174,12 @@
 
         let allPayments = [];
         let currentFilter = 'all';
+        let searchTerm = '';
+
+        window.handleSearch = () => {
+            searchTerm = document.getElementById('idSearch').value.trim().toUpperCase();
+            renderList(currentFilter);
+        };
 
         // Local helper for template literals
         const escHtml = (str = '') => {
@@ -207,11 +221,18 @@
 
         function renderList(filter) {
             let list = allPayments;
+            
+            // Search filter (Case insensitive prefix match)
+            if (searchTerm) {
+                list = list.filter(p => p.id.toUpperCase().startsWith(searchTerm) || 
+                                       p.contact?.toUpperCase().includes(searchTerm));
+            }
+
             if (filter !== 'all') {
                 if (['standard', 'extreme'].includes(filter)) {
-                    list = allPayments.filter(p => p.tier === filter);
+                    list = list.filter(p => p.tier === filter);
                 } else {
-                    list = allPayments.filter(p => p.status === filter);
+                    list = list.filter(p => p.status === filter);
                 }
             }
 
@@ -290,12 +311,19 @@
                         ${p.status === 'approved' ? `<button class="action-btn btn-reject" onclick="rejectPayment('${p.id}')"><span class="material-symbols-rounded" style="font-size:0.9rem;">undo</span> ยกเลิกสิทธิ์</button>` : ''}
                     </div>`;
 
+                const displayId = p.id.substring(0, 10).toUpperCase();
+
                 return `
                     <div class="pay-item ${p.status}">
                         <div class="pay-item-header">
                             <div class="pay-item-info">
-                                <div class="pay-ref">📄 ${p.id}</div>
-                                <div class="pay-contact-name">${escHtml(p.contact || '—')}</div>
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                                    <div class="pay-ref" style="font-family:'Courier New', monospace; color:#4ade80; font-weight:900; font-size:1.3rem; letter-spacing:2px; background:rgba(74,222,128,0.1); padding:4px 12px; border-radius:8px;">🎫 ID: ${displayId}</div>
+                                    <button class="action-btn" onclick="copyToClipboard('${displayId}', this)" style="padding:4px 8px; font-size:0.7rem;">
+                                        <span class="material-symbols-rounded" style="font-size:0.9rem;">content_copy</span> ก็อป ID
+                                    </button>
+                                </div>
+                                <div class="pay-contact-name" style="font-size:0.95rem;">🛒 ผู้ซื้อ: <strong style="color:white;">${escHtml(p.contact || '—')}</strong></div>
                                 ${tierBadge}
                             </div>
                             <div class="pay-status">${statusMap[p.status] || ''}</div>
