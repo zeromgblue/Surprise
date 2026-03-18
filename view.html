@@ -9,7 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
     <style>
-        body { display:flex; align-items:center; justify-content:center; min-height:100vh; overflow-x:hidden; }
+        body { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:20px 0; overflow-x:hidden; background:var(--background); }
+        @media (max-width:480px) { body { justify-content: flex-start; padding-top: 40px; } }
 
         /* Loading */
         #loading-screen { position:fixed; inset:0; background:var(--background); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1000; gap:16px; transition:opacity 0.5s ease; }
@@ -18,7 +19,7 @@
         @keyframes spin { to { transform:rotate(360deg); } }
 
         /* Intro screen */
-        #intro-screen { display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; max-width:480px; width:100%; gap:0; }
+        #intro-screen { display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; max-width:480px; width:100%; gap:0; margin: auto 0; }
         #intro-screen.show { display:flex; animation:fadeInUp 0.6s ease; }
 
         .envelope-box {
@@ -58,7 +59,7 @@
         @keyframes pulseTap { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
 
         /* Viewer */
-        #viewer { display:none; width:100%; max-width:540px; padding:20px; }
+        #viewer { display:none; width:100%; max-width:540px; padding:16px; margin: 0 auto; }
         #viewer.show { display:block; animation:fadeInUp 0.5s ease; }
 
         .view-card { border-radius:24px; overflow:hidden; position:relative; }
@@ -67,19 +68,20 @@
 
         .view-tag { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6; margin-bottom:20px; display:flex; align-items:center; gap:6px; }
         .view-to { font-size:0.82rem; opacity:0.6; margin-bottom:6px; }
-        .view-name { font-size:2rem; font-weight:800; font-family:'Outfit',sans-serif; margin-bottom:28px; line-height:1.1; }
-        @media (max-width:400px) { .view-name { font-size:1.6rem; } }
-        .view-message { font-size:1rem; line-height:1.9; white-space:pre-wrap; word-break:break-word; min-height:80px; }
+        .view-name { font-size:2rem; font-weight:800; font-family:'Outfit',sans-serif; margin-bottom:28px; line-height:1.2; word-wrap:break-word; overflow-wrap:break-word; }
+        @media (max-width:400px) { .view-name { font-size:1.6rem; margin-bottom:20px; } }
+        .view-message { font-size:1rem; line-height:1.7; white-space:pre-wrap; word-break:break-word; min-height:80px; }
         .view-message.typewriter::after { content:'|'; animation:blink 1s step-end infinite; }
         @keyframes blink { 50% { opacity: 0; } }
         .view-from { font-weight:700; font-size:0.9rem; margin-top:32px; opacity:0; transform:translateY(10px); transition:all 0.5s ease; }
         .view-from.show { opacity:0.8; transform:translateY(0); }
         .view-divider { height:1px; background:rgba(255,255,255,0.1); margin:24px 0; }
-        .view-meta { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; opacity:0; transition:opacity 0.5s ease; }
+        .view-meta { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-top: 8px; opacity:0; transition:opacity 0.5s ease; }
         .view-meta.show { opacity:1; }
         .view-count-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:50px; padding:4px 12px; font-size:0.75rem; color:rgba(255,255,255,0.5); }
-        .create-own-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:50px; border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); font-size:0.8rem; text-decoration:none; transition:all 0.2s ease; background:rgba(255,255,255,0.04); }
+        .create-own-btn { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; border-radius:50px; border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); font-size:0.8rem; text-decoration:none; transition:all 0.2s ease; background:rgba(255,255,255,0.06); }
         .create-own-btn:hover { background:rgba(255,255,255,0.1); color:white; }
+        @media (max-width:380px) { .view-meta { flex-direction: column; align-items: flex-start; } .create-own-btn { width: 100%; justify-content: center; } }
 
         .interact-btn {
             width:100%; margin-top:20px; padding:13px;
@@ -210,7 +212,7 @@
             const cardBorder = `1px solid ${tpl.from}44`;
 
             viewer.innerHTML = `
-                <div class="view-card glass-card" id="tilt-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2" style="padding:0; background:${cardBg}; border:${cardBorder}; box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.1);">
+                <div class="view-card glass-card" id="tilt-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2" data-tilt-touch="false" style="padding:0; background:${cardBg}; border:${cardBorder}; box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.1);">
                     <div style="height:5px; background:linear-gradient(to right,${tpl.from},${tpl.to});"></div>
                     <div class="view-card-inner">
                         <div class="view-tag" style="transform: translateZ(20px);">
