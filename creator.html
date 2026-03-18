@@ -362,7 +362,7 @@
     <script type="module">
         import { auth, db } from './firebase-config.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-        import { collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+        import { collection, addDoc, serverTimestamp, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
         import { TEMPLATES, CATEGORIES } from './templates-data.js';
 
         let selectedTemplateId = null;
@@ -371,11 +371,15 @@
         let userTier = 'free'; // Default state before DB check
         const urlParams = new URLSearchParams(window.location.search);
 
+        let tierUnsubscribe = null;
+
         // Auth & Tier Management
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             currentUser = user;
             const navUser = document.getElementById('nav-user');
             
+            if (tierUnsubscribe) { tierUnsubscribe(); tierUnsubscribe = null; }
+
             if (user) {
                 navUser.innerHTML = `
                     <a href="dashboard.html" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:white; font-size:0.85rem; font-weight:500;">
@@ -383,27 +387,42 @@
                         <span style="max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${user.displayName||user.email}</span>
                     </a>`;
                 
-                // --- BACKEND CHECK: Fetch tier from Firestore ---
                 if (user.uid === 'qqzXIApGiHVh2r78spN1BeZ7Qzz2') {
-                    userTier = 'extreme'; // Admin bypass for review
-                    console.log("Welcome Admin! Access granted.");
+                    userTier = 'extreme';
+                    updateTierUI(userTier);
+                    renderChips();
+                    renderGrid();
                 } else {
-                    try {
-                        const userDoc = await getDoc(doc(db, 'users', user.uid));
-                        if (userDoc.exists()) {
-                            userTier = userDoc.data().tier || 'free';
+                    tierUnsubscribe = onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
+                        const oldTier = userTier;
+                        if (snapshot.exists()) {
+                            userTier = snapshot.data().tier || 'free';
+                        } else {
+                            userTier = 'free';
                         }
-                    } catch (e) { console.error("Error fetching tier:", e); }
+                        
+                        updateTierUI(userTier);
+                        renderChips();
+                        renderGrid();
+
+                        if (oldTier !== 'free' && oldTier !== userTier && userTier !== 'free') {
+                            console.log("Tier updated to " + userTier);
+                        }
+                    }, (err) => {
+                        console.error("Tier listener error:", err);
+                        userTier = 'free';
+                        updateTierUI(userTier);
+                        renderChips();
+                        renderGrid();
+                    });
                 }
             } else {
                 navUser.innerHTML = `<a href="index.html" class="btn-secondary" style="padding:6px 14px;font-size:0.82rem;">กลับหน้าหลัก</a>`;
                 userTier = 'free';
+                updateTierUI(userTier);
+                renderChips();
+                renderGrid();
             }
-
-            // Sync UI with the fetched tier
-            updateTierUI(userTier);
-            renderChips();
-            renderGrid();
         });
 
         // Build category chips dynamically based on what's available for Current User Tier

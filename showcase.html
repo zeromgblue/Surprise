@@ -109,7 +109,7 @@
                 <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 30px; line-height: 1.8;">
                     2 เทมเพลตคลาสสิก เรียบง่าย ใช้งานได้ทันที ไม่ต้องจ่ายอะไร ส่งความรู้สึกดีๆ ได้เลย
                 </p>
-                <a href="creator.html?tier=free" class="btn-secondary" style="padding: 14px 32px; font-size: 1.05rem;">
+                <a id="btn-free" href="creator.html?tier=free" class="btn-secondary" style="padding: 14px 32px; font-size: 1.05rem;">
                     เริ่มต้นใช้งานฟรี
                 </a>
             </div>
@@ -127,7 +127,7 @@
                 <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 30px; line-height: 1.8;">
                     30 เทมเพลตสุดพิเศษ ครอบคลุมทุกเทศกาล Canvas 2D สวยงาม เหมาะส่งให้แฟน เพื่อน หรือครอบครัว
                 </p>
-                <a href="payment.html?tier=standard" class="btn-primary" style="padding: 14px 32px; font-size: 1.05rem; box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);">
+                <a id="btn-standard" href="payment.html?tier=standard" class="btn-primary" style="padding: 14px 32px; font-size: 1.05rem; box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);">
                     ชำระเงิน Standard (20 บาท)
                 </a>
             </div>
@@ -145,7 +145,7 @@
                 <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 30px; line-height: 1.8;">
                     100+ เทมเพลตระดับ Premium — อวกาศ 3D, เวทมนตร์, มินิเกม, Cinematic, ธรรมชาติ, แลนด์มาร์ก, Fluid Art, เทศกาล, ไฮโซ VIP ครบทุกหมวด
                 </p>
-                <a href="payment.html?tier=extreme" class="btn-primary" style="padding: 14px 32px; font-size: 1.05rem; background: linear-gradient(135deg, #F59E0B, #EF4444); box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);">
+                <a id="btn-extreme" href="payment.html?tier=extreme" class="btn-primary" style="padding: 14px 32px; font-size: 1.05rem; background: linear-gradient(135deg, #F59E0B, #EF4444); box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);">
                     ชำระเงิน EXTREME (120 บาท)
                 </a>
             </div>
@@ -167,5 +167,48 @@
             <p>© 2026 Surprise Me Platform — สร้างความประทับใจได้ง่ายๆ ใน 1 นาที</p>
         </div>
     </footer>
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+        const btnStd = document.getElementById('btn-standard');
+        const btnExt = document.getElementById('btn-extreme');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const snap = await getDoc(doc(db, 'users', user.uid));
+                    if (snap.exists()) {
+                        const tier = snap.data().tier || 'free';
+                        
+                        if (tier === 'standard') {
+                            const btnFree = document.getElementById('btn-free');
+                            btnFree.innerHTML = '<span class="material-symbols-rounded">magic_button</span> ไปหน้าสร้างเซอร์ไพรส์';
+                            btnFree.href = "creator.html?tier=standard";
+
+                            btnStd.innerHTML = '<span class="material-symbols-rounded">rocket_launch</span> เปิดใช้งาน Standard';
+                            btnStd.href = "creator.html?tier=standard";
+                            btnStd.style.background = "linear-gradient(135deg, #4ade80, #22c55e)";
+                        } else if (tier === 'extreme') {
+                            const btnFree = document.getElementById('btn-free');
+                            btnFree.innerHTML = '<span class="material-symbols-rounded">rocket_launch</span> เปิดใช้งาน EXTREME';
+                            btnFree.href = "creator.html?tier=extreme";
+                            btnFree.style.background = "linear-gradient(135deg, #4ade80, #22c55e)";
+                            btnFree.style.color = "white";
+
+                            btnStd.innerHTML = '<span class="material-symbols-rounded">check_circle</span> รวมอยู่ใน EXTREME แล้ว';
+                            btnStd.href = "creator.html?tier=extreme";
+                            btnStd.style.opacity = "0.7";
+
+                            btnExt.innerHTML = '<span class="material-symbols-rounded">rocket_launch</span> เปิดใช้งาน EXTREME';
+                            btnExt.href = "creator.html?tier=extreme";
+                            btnExt.style.background = "linear-gradient(135deg, #4ade80, #22c55e)";
+                        }
+                    }
+                } catch(e) { console.error("Error checking tier:", e); }
+            }
+        });
+    </script>
 </body>
 </html>

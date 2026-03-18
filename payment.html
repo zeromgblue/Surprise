@@ -108,9 +108,30 @@
         .timer-badge { display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:6px 14px;border-radius:50px;font-size:0.8rem;color:var(--text-muted);margin-top:12px; }
 
         @keyframes fadeInUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+        
+        /* Success Top Bar */
+        #success-nav-bar {
+            position: fixed; top: 0; left: 0; right: 0; height: 60px;
+            background: linear-gradient(to right, #FF3366, #9333EA);
+            display: none; align-items: center; justify-content: center;
+            z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            animation: slideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+        .success-nav-link { 
+            color: white; text-decoration: none; font-weight: 700; font-size: 0.95rem;
+            display: flex; align-items: center; gap: 8px;
+        }
     </style>
 </head>
 <body>
+    <div id="success-nav-bar">
+        <a href="creator.html" class="success-nav-link">
+            <span class="material-symbols-rounded">rocket_launch</span>
+            ส่งสลิปสำเร็จ! ไปเริ่มสร้างเซอร์ไพรส์ของคุณเลย
+            <span class="material-symbols-rounded">arrow_forward</span>
+        </a>
+    </div>
     <div class="pay-wrap">
         <!-- Header -->
         <div class="pay-header">
@@ -207,7 +228,7 @@
             </div>
 
             <!-- Submit -->
-            <button class="pay-submit-btn" id="submitBtn" onclick="submitPayment()">
+            <button class="pay-submit-btn" id="submitBtn">
                 <span class="material-symbols-rounded">send</span>
                 ส่งหลักฐานการชำระเงิน
             </button>
@@ -242,11 +263,6 @@
     </div>
 
     <script type="module">
-        import { db, storage } from './firebase-config.js';
-        import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-
         // ============================================================
         // ⚙️ CONFIG TrueMoney Wallet
         // ============================================================
@@ -256,13 +272,17 @@
         };
         // ============================================================
 
+        import { auth, db, storage } from './firebase-config.js';
+        import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
         const params = new URLSearchParams(window.location.search);
         const tier = params.get('tier') || 'standard';
 
         let currentUser = null;
         let slipFile = null;
 
-        const auth = getAuth();
         onAuthStateChanged(auth, u => { currentUser = u; });
 
         // Tier config
@@ -355,53 +375,128 @@
             }
         });
 
+        // Helper: Compress image before upload
+        async function compressImage(file, maxWidth = 1000, quality = 0.6) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            height = Math.round((maxWidth / width) * height);
+                            width = maxWidth;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        canvas.toBlob((blob) => {
+                            if (blob) resolve(blob);
+                            else reject(new Error("Compression failed"));
+                        }, 'image/jpeg', quality);
+                    };
+                    img.onerror = reject;
+                };
+                reader.onerror = reject;
+            });
+        }
+
         // --- Submit ---
-        window.submitPayment = async () => {
-            const contact = document.getElementById('pay-contact').value.trim();
-            const amount  = document.getElementById('pay-amount-input').value.trim();
-            if (!contact) { document.getElementById('pay-contact').focus(); alert('กรุณากรอกชื่อหรือ LINE ID'); return; }
-            if (!slipFile) { alert('กรุณาแนบสลิปการโอนเงิน'); return; }
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', async () => {
+                console.log("Submit clicked");
+                const contactInput = document.getElementById('pay-contact');
+                const amountInput  = document.getElementById('pay-amount-input');
+                const noteInput    = document.getElementById('pay-note');
 
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<div style="width:20px;height:20px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;"></div> กำลังส่ง...';
+                const contact = contactInput.value.trim();
+                const amount  = amountInput.value.trim();
 
-            try {
-                // 1. Upload slip image to Firebase Storage
-                let slipUrl = null;
+                if (!contact) { contactInput.focus(); alert('กรุณากรอกชื่อหรือ LINE ID สำหรับการติดต่อกลับ'); return; }
+                if (!slipFile) { alert('กรุณาแนบรูปภาพสลิปการโอนเงินเพื่อตรวจสอบ'); return; }
+                if (!amount) { amountInput.focus(); alert('กรุณาระบุจำนวนเงินที่โอน'); return; }
+
+                // Loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<div style="width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;"></div> <span id="pay-status-text">กำลังย่อขนาดรูป...</span>';
+                const statusText = document.getElementById('pay-status-text');
+
                 try {
-                    const storageRef = ref(storage, `payment-slips/${Date.now()}_${slipFile.name}`);
-                    const snap = await uploadBytes(storageRef, slipFile);
-                    slipUrl = await getDownloadURL(snap.ref);
-                } catch(storageErr) {
-                    console.warn('Storage not configured, skipping upload:', storageErr);
+                    let slipUrl = null;
+                    let fileToUpload = slipFile;
+
+                    // 1. Compress Image (Faster Upload)
+                    try {
+                        console.log("Compressing...");
+                        fileToUpload = await compressImage(slipFile);
+                        console.log("Compressed size:", (fileToUpload.size / 1024).toFixed(1) + " KB");
+                    } catch (compErr) {
+                        console.warn("Compression failed, using original file", compErr);
+                    }
+                    
+                    if (statusText) statusText.textContent = "กำลังอัปโหลดสลิป...";
+
+                    // 2. Upload to Firebase Storage
+                    console.log("Starting upload...");
+                    try {
+                        const fileName = `${Date.now()}_slip.jpg`; // Use standardized name
+                        const storageRef = ref(storage, `payment-slips/${fileName}`);
+                        
+                        await Promise.race([
+                            uploadBytes(storageRef, fileToUpload).then(async (snap) => {
+                                slipUrl = await getDownloadURL(snap.ref);
+                                console.log("Upload success:", slipUrl);
+                            }),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error("Upload Timeout")), 15000))
+                        ]);
+                    } catch(storageErr) {
+                        console.warn('Storage Error or Timeout:', storageErr);
+                    }
+
+                    if (statusText) statusText.textContent = "กำลังบันทึกข้อมูล...";
+
+                    // 2. Save payment record to Firestore
+                    console.log("Saving record to Firestore...");
+                    const docData = {
+                        tier: tier,
+                        amount: parseFloat(amount) || t.amount,
+                        contact: contact,
+                        note: document.getElementById('pay-note').value.trim(),
+                        slipUrl: slipUrl,
+                        uid: currentUser?.uid || null,
+                        userEmail: currentUser?.email || null,
+                        status: 'pending',
+                        createdAt: serverTimestamp(),
+                        uploadHandled: !!slipUrl
+                    };
+
+                    const docRef = await addDoc(collection(db, 'payments'), docData);
+                    console.log("Success! Doc ID:", docRef.id);
+
+                    // 3. Show success
+                    document.getElementById('pay-form').style.display = 'none';
+                    const successNav = document.getElementById('success-nav-bar');
+                    if (successNav) successNav.style.display = 'flex';
+                    
+                    const successScreen = document.getElementById('success-screen');
+                    successScreen.classList.add('show');
+                    document.getElementById('ref-id').textContent = docRef.id.substring(0, 8).toUpperCase();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                } catch(err) {
+                    console.error('Final Submission Error:', err);
+                    alert('ไม่สามารถส่งข้อมูลได้: ' + (err.message || 'เครือข่ายขัดข้อง'));
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span class="material-symbols-rounded">send</span> ส่งหลักฐานการชำระเงิน';
                 }
-
-                // 2. Save payment record to Firestore
-                const docRef = await addDoc(collection(db, 'payments'), {
-                    tier,
-                    amount: parseFloat(amount) || t.amount,
-                    contact,
-                    note: document.getElementById('pay-note').value.trim(),
-                    slipUrl,
-                    uid: currentUser?.uid || null,
-                    userEmail: currentUser?.email || null,
-                    status: 'pending',    // pending | approved | rejected
-                    createdAt: serverTimestamp(),
-                });
-
-                // 3. Show success
-                document.getElementById('pay-form').style.display = 'none';
-                document.getElementById('success-screen').classList.add('show');
-                document.getElementById('ref-id').textContent = docRef.id.substring(0, 8).toUpperCase();
-
-            } catch(err) {
-                console.error(err);
-                alert('เกิดข้อผิดพลาด: ' + err.message);
-                btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-rounded">send</span> ส่งหลักฐานการชำระเงิน';
-            }
-        };
+            });
+        }
     </script>
 </body>
 </html>
