@@ -185,9 +185,14 @@
             setTimeout(async () => {
                 intro.style.display = 'none';
                 
-                // Dynamic Template Engine
+                // Targeted Template Engine
+                async function loadTemplateModule(targetTpl) {
+                    const folder = targetTpl.part ? `./templates_${targetTpl.part}` : './templates';
+                    return await import(`${folder}/tpl-${targetTpl.id}.js`);
+                }
+
                 try {
-                    const module = await import(`./templates/tpl-${tpl.id}.js`);
+                    const module = await loadTemplateModule(tpl);
                     await module.render($('viewer'), surpriseData, tpl);
                     $('viewer').classList.add('show');
                 } catch (e) {

@@ -156,8 +156,8 @@
 
         async function loadTemplate() {
             try {
-                // Try loading the specific template JS
-                const mod = await import(`./templates/tpl-${tpl.id}.js`);
+                const folder = tpl.part ? `./templates_${tpl.part}` : './templates';
+                const mod = await import(`${folder}/tpl-${tpl.id}.js`);
                 await mod.render(container, previewData, tpl);
             } catch(e) {
                 console.warn('Template JS not found, using classic fallback:', e.message);
