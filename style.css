@@ -1,14 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap');
 
 :root {
-  --primary: #FF3366;
-  --secondary: #6B21A8;
-  --accent: #00D2FF;
-  --background: #0F0F0F;
-  --glass: rgba(255, 255, 255, 0.05);
+  --primary: #0284C7; /* Ocean Blue */
+  --secondary: #10B981; /* Emerald Green */
+  --accent: #0ea5e9; /* Sky Blue */
+  --background: #0B1121; /* Deep Premium Dark Blue/Black */
+  --glass: rgba(15, 23, 42, 0.5); /* Dark Glass */
   --glass-border: rgba(255, 255, 255, 0.1);
-  --text-main: #FFFFFF;
-  --text-muted: #A1A1AA;
+  --text-main: #F8FAFC; /* Bright White */
+  --text-muted: #94A3B8; /* Muted Slate */
+  --glass-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -31,13 +32,20 @@ body::before {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background: 
-    radial-gradient(circle at 20% 30%, rgba(255, 51, 102, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(107, 33, 168, 0.15) 0%, transparent 40%);
+    radial-gradient(circle at 10% 20%, rgba(2, 132, 199, 0.18) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.18) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.1) 0%, transparent 50%);
+  animation: pulseBg 12s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: -1;
+}
+
+@keyframes pulseBg {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
 }
 
 h1, h2, h3 {
@@ -49,40 +57,43 @@ h1, h2, h3 {
 /* Glass UI Elements */
 .glass-card {
   background: var(--glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   padding: 2rem;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  transition: transform 0.3s ease, border-color 0.3s ease;
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .glass-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(255, 51, 102, 0.3);
+  transform: translateY(-8px);
+  border-color: rgba(2, 132, 199, 0.4);
+  box-shadow: 0 20px 40px -10px rgba(2, 132, 199, 0.25);
 }
 
 /* Buttons */
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary), var(--accent));
   color: white;
   border: none;
   padding: 12px 28px;
   border-radius: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: inline-flex;
   align-items: center;
   gap: 8px;
   text-decoration: none;
   font-size: 1rem;
+  box-shadow: 0 8px 20px -6px rgba(2, 132, 199, 0.4);
 }
 
 .btn-primary:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 24px -8px rgba(2, 132, 199, 0.8);
+  color: white;
 }
 
 .btn-secondary {
@@ -98,11 +109,15 @@ h1, h2, h3 {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.3);
 }
 
 .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -6px rgba(2, 132, 199, 0.2);
+  color: white;
 }
 
 /* Animations */
@@ -138,7 +153,7 @@ header {
 .logo {
   font-size: 1.5rem;
   font-weight: 800;
-  background: linear-gradient(to right, var(--primary), var(--accent));
+  background: linear-gradient(to right, var(--primary), var(--secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: flex;
@@ -156,8 +171,9 @@ header {
   font-size: 4rem;
   line-height: 1.1;
   margin-bottom: 24px;
-  background: linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #94A3B8 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

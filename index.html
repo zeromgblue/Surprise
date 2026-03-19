@@ -16,20 +16,21 @@
         .nav-auth { display: flex; align-items: center; gap: 12px; }
         .user-chip {
             display: flex; align-items: center; gap: 8px;
-            background: rgba(255,255,255,0.07);
+            background: var(--glass);
             border: 1px solid var(--glass-border);
             border-radius: 50px; padding: 6px 14px 6px 6px;
             cursor: pointer; transition: all 0.3s ease;
-            text-decoration: none; color: white;
+            text-decoration: none; color: #FFFFFF;
+            box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.3);
         }
-        .user-chip:hover { background: rgba(255,255,255,0.13); }
+        .user-chip:hover { background: rgba(255,255,255,0.1); border-color: rgba(2, 132, 199, 0.5); transform: translateY(-2px); box-shadow: 0 8px 16px -6px rgba(2, 132, 199, 0.3); }
         .user-chip img {
             width: 28px; height: 28px; border-radius: 50%;
             border: 2px solid var(--primary);
         }
         .user-chip span.name { font-weight: 600; font-size: 0.9rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .badge-new {
-            background: linear-gradient(135deg, #00D2FF, #6B21A8);
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
             color: white; font-size: 0.65rem; font-weight: 700;
             padding: 2px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em;
         }
@@ -41,9 +42,10 @@
             background: var(--glass);
             border: 1px solid var(--glass-border);
             border-radius: 20px; padding: 28px;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.05);
         }
-        .feature-item:hover { transform: translateY(-4px); border-color: rgba(0,210,255,0.3); }
+        .feature-item:hover { transform: translateY(-8px); border-color: rgba(2, 132, 199, 0.3); box-shadow: 0 20px 40px -10px rgba(2, 132, 199, 0.12); }
         .feature-icon {
             width: 52px; height: 52px; border-radius: 14px;
             display: flex; align-items: center; justify-content: center;
@@ -54,29 +56,31 @@
         .step { flex: 1; min-width: 200px; max-width: 260px; }
         .step-num {
             width: 48px; height: 48px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
             display: flex; align-items: center; justify-content: center;
             font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.2rem;
             margin: 0 auto 16px;
+            box-shadow: 0 8px 20px -6px rgba(2, 132, 199, 0.4);
         }
         .template-badge {
             position: absolute; top: 14px; right: 14px;
             font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
             letter-spacing: 0.06em; padding: 4px 10px; border-radius: 20px;
         }
-        .badge-hot { background: rgba(255,51,102,0.2); color: #FF3366; border: 1px solid rgba(255,51,102,0.3); }
-        .badge-popular { background: rgba(0,210,255,0.15); color: #00D2FF; border: 1px solid rgba(0,210,255,0.3); }
-        .badge-soon { background: rgba(161,161,170,0.15); color: #A1A1AA; border: 1px solid rgba(161,161,170,0.3); }
+        .badge-hot { background: rgba(2, 132, 199, 0.1); color: var(--primary); border: 1px solid rgba(2, 132, 199, 0.2); }
+        .badge-popular { background: rgba(14, 165, 233, 0.1); color: var(--accent); border: 1px solid rgba(14, 165, 233, 0.2); }
+        .badge-soon { background: rgba(100, 116, 139, 0.1); color: var(--text-muted); border: 1px solid rgba(100, 116, 139, 0.2); }
         .hero-stats { display: flex; gap: 40px; justify-content: center; margin-top: 50px; flex-wrap: wrap; }
         .stat { text-align: center; }
         .stat-num { font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 800; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         .stat-label { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
         .cta-section {
             margin: 80px 0; padding: 60px; border-radius: 28px;
-            background: linear-gradient(135deg, rgba(255,51,102,0.12), rgba(107,33,168,0.12));
-            border: 1px solid rgba(255,51,102,0.2); text-align: center;
+            background: linear-gradient(135deg, rgba(2, 132, 199, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(2, 132, 199, 0.2); text-align: center;
         }
-        #auth-loading { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
+        #auth-loading { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -94,13 +98,13 @@
 
         <!-- Hero Section -->
         <section class="hero-section">
-            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(0,210,255,0.1); border: 1px solid rgba(0,210,255,0.25); border-radius: 50px; padding: 6px 16px; margin-bottom: 30px;" class="fade-in">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(2, 132, 199, 0.15); border: 1px solid rgba(2, 132, 199, 0.3); border-radius: 50px; padding: 6px 16px; margin-bottom: 30px;" class="fade-in">
                 <span class="material-symbols-rounded" style="font-size:1rem; color: var(--accent);">auto_awesome</span>
                 <span style="font-size: 0.85rem; color: var(--accent);">ตอนนี้รองรับ Firebase — บันทึกเซอร์ไพรส์ถาวร</span>
             </div>
             <h1 class="hero-title fade-in" style="animation-delay: 0.2s;">
                 สร้างรอยยิ้มผ่าน <br>
-                <span style="background: linear-gradient(to right, #00D2FF, #FF3366); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">ความทรงจำดิจิทัล</span>
+                <span style="background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">ความทรงจำดิจิทัล</span>
             </h1>
             <p class="hero-subtitle fade-in" style="animation-delay: 0.4s;">
                 เปลี่ยนข้อความของคุณให้เป็นเซอร์ไพรส์สุดว้าว ส่งให้คนที่คุณรักผ่านลิงก์สั้นๆ เพียงลิงก์เดียว — ไม่มีหมดอายุ ปลอดภัย 100%
@@ -178,29 +182,29 @@
             <p style="text-align: center; color: var(--text-muted); margin-bottom: 0;" class="fade-in">ทุกฟีเจอร์ออกแบบมาเพื่อให้คุณสร้างเซอร์ไพรส์ได้ง่ายและสวยงามที่สุด</p>
             <div class="feature-grid fade-in">
                 <div class="feature-item">
-                    <div class="feature-icon" style="background: rgba(255,51,102,0.15);">
+                    <div class="feature-icon" style="background: rgba(2, 132, 199, 0.1);">
                         <span class="material-symbols-rounded" style="color:var(--primary);">cloud_done</span>
                     </div>
                     <h3 style="margin-bottom: 8px; font-size: 1.1rem;">บันทึกถาวรบน Cloud</h3>
                     <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">เซอร์ไพรส์ของคุณเก็บบน Firebase ปลอดภัย ไม่มีหายหรือหมดอายุ</p>
                 </div>
                 <div class="feature-item">
-                    <div class="feature-icon" style="background: rgba(0,210,255,0.15);">
-                        <span class="material-symbols-rounded" style="color:var(--accent);">link</span>
+                    <div class="feature-icon" style="background: rgba(16, 185, 129, 0.1);">
+                        <span class="material-symbols-rounded" style="color:var(--secondary);">link</span>
                     </div>
                     <h3 style="margin-bottom: 8px; font-size: 1.1rem;">ลิงก์สั้น แชร์ง่าย</h3>
                     <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">ลิงก์ในรูปแบบ /view/[id] สวยงาม ส่งได้ทุก Platform</p>
                 </div>
                 <div class="feature-item">
-                    <div class="feature-icon" style="background: rgba(107,33,168,0.2);">
-                        <span class="material-symbols-rounded" style="color:#A78BFA;">manage_accounts</span>
+                    <div class="feature-icon" style="background: rgba(14, 165, 233, 0.1);">
+                        <span class="material-symbols-rounded" style="color:var(--accent);">manage_accounts</span>
                     </div>
                     <h3 style="margin-bottom: 8px; font-size: 1.1rem;">Dashboard ส่วนตัว</h3>
                     <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Login ด้วย Google เพื่อดูและจัดการเซอร์ไพรส์ทั้งหมดของคุณ</p>
                 </div>
                 <div class="feature-item">
-                    <div class="feature-icon" style="background: rgba(16,185,129,0.15);">
-                        <span class="material-symbols-rounded" style="color:#34D399;">bar_chart</span>
+                    <div class="feature-icon" style="background: rgba(2, 132, 199, 0.1);">
+                        <span class="material-symbols-rounded" style="color:var(--primary);">bar_chart</span>
                     </div>
                     <h3 style="margin-bottom: 8px; font-size: 1.1rem;">ติดตามยอดดู</h3>
                     <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">รู้ว่าคนที่คุณส่งให้เปิดดูแล้วหรือยัง ด้วย View Count แบบ Real-time</p>
