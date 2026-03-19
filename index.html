@@ -232,8 +232,9 @@
     </div>
 
     <script type="module">
-        import { auth, googleProvider } from './firebase-config.js';
+        import { auth, db, googleProvider } from './firebase-config.js';
         import { onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+        import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
         import { TEMPLATES } from './templates-data.js';
 
         let currentUser = null;
@@ -267,8 +268,20 @@
         const navAuth = document.getElementById('nav-auth');
         const heroDashBtn = document.getElementById('hero-dash-btn');
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
+                // Save user profile to Firestore
+                try {
+                    await setDoc(doc(db, 'users', user.uid), {
+                        name: user.displayName || 'ไม่มีชื่อ',
+                        email: user.email || '',
+                        photoURL: user.photoURL || '',
+                        lastLogin: serverTimestamp()
+                    }, { merge: true });
+                } catch(err) {
+                    console.error("Error saving user data:", err);
+                }
+
                 navAuth.innerHTML = `
                     <a href="dashboard.html" class="user-chip" title="ดูผลงานของฉัน">
                         <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'U') + '&background=FF3366&color=fff'}" alt="avatar">

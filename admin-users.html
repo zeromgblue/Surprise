@@ -3,99 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จัดการยศแอดมิน | Admin</title>
+    <title>จัดการผู้ใช้ & เซอร์ไพรส์ | Admin</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
-        body { margin:0; padding:20px; box-sizing:border-box; }
-        .admin-wrap { max-width:600px; margin:0 auto; }
+        body { margin:0; padding:16px; box-sizing:border-box; }
+        .admin-wrap { max-width:700px; margin:0 auto; }
         
         .adm-header { 
             display:flex; align-items:center; justify-content:space-between; 
-            margin-bottom:30px; padding-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); 
+            margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.08); 
         }
-        .adm-title { font-size:1.5rem; font-weight:800; }
-        .adm-title small { display:block; font-size:0.82rem; font-weight:400; color:var(--text-muted); margin-top:2px; }
+        .adm-title { font-size:1.3rem; font-weight:800; }
+        .adm-title small { display:block; font-size:0.8rem; font-weight:400; color:var(--text-muted); margin-top:4px; }
 
-        .glass-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px; padding: 24px;
-        }
-
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-muted); }
-        .form-input { 
-            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.05); color: white; outline: none; font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-        .form-input:focus { border-color: var(--primary); }
-
-        .btn-grant {
-            width: 100%; padding: 14px; border-radius: 12px; border: none;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn-grant:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .admin-list { margin-top: 30px; }
+        .admin-list { margin-top: 20px; }
         .admin-item {
-            display: flex; align-items: center; justify-content: space-between;
-            background: rgba(255,255,255,0.02); padding: 12px 16px; border-radius: 14px; margin-bottom: 10px;
+            display: flex; flex-direction: column; gap:12px;
+            background: rgba(255,255,255,0.03); padding: 16px; border-radius: 14px; margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        .admin-item-info { flex: 1; }
+        .admin-item-info { display: flex; justify-content: space-between; align-items: flex-start; }
         .admin-uid { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
-        .btn-revoke {
-            padding: 8px; border-radius: 8px; border: 1px solid rgba(248,113,113,0.2);
-            background: rgba(248,113,113,0.1); color: #f87171; cursor: pointer;
+        .btn-action {
+            padding: 8px 12px; border-radius: 8px; font-size:0.85rem; cursor: pointer; border:1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color:white;
         }
+        .btn-revoke { color: #f87171; border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.1); }
+        .btn-grant { color: #34d399; border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.1); }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px;
+        }
+        .modal-content {
+            background: #111; border: 1px solid var(--glass-border); border-radius: 20px;
+            max-width: 500px; width: 100%; padding: 24px; max-height: 80vh; overflow-y:auto;
+        }
+        .surprise-card {
+            background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-bottom:12px;
+        }
+        .close-btn { background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; float:right; }
 
         #loading-overlay {
             position: fixed; inset: 0; background: rgba(8, 8, 8, 0.9);
-            backdrop-filter: blur(15px); z-index: 9999;
+            backdrop-filter: blur(5px); z-index: 9999;
             display: none; align-items: center; justify-content: center; flex-direction: column;
-            gap: 24px;
+            gap: 16px;
         }
-        .loader-ring { width: 50px; height: 50px; border-radius: 50%; border: 4px solid rgba(255,51,102,0.1); border-top: 4px solid #FF3366; animation: spin 1s linear infinite; }
+        .loader-ring { width: 40px; height: 40px; border-radius: 50%; border: 3px solid rgba(255,51,102,0.1); border-top: 3px solid #FF3366; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div id="loading-overlay">
         <div class="loader-ring"></div>
-        <div style="color:white; font-weight:700;">กำลังดำเนินการ...</div>
+        <div style="color:white; font-size:0.9rem;">กำลังดำเนินการ...</div>
+    </div>
+
+    <!-- Modal for Surprises -->
+    <div class="modal-overlay" id="surprise-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="document.getElementById('surprise-modal').style.display='none'">&times;</button>
+            <h3 id="modal-title" style="margin-bottom:16px;">ผลงานเซอร์ไพรส์</h3>
+            <div id="modal-list"></div>
+        </div>
     </div>
 
     <div class="admin-wrap">
         <div class="adm-header">
             <div class="adm-title">
-                🛡️ จัดการยศแอดมิน
-                <small>เพิ่มหรือถอนสิทธิ์ผู้ดูแลระบบ (Sub-Admin)</small>
+                👥 จัดการผู้ใช้ & ผลงาน
+                <small>แยกเซอร์ไพรส์ตามผู้ใช้งานชัดเจน</small>
             </div>
-            <a href="dashboard.html" class="btn-secondary" style="padding:8px 16px; font-size:0.82rem;">
-                <span class="material-symbols-rounded">dashboard</span> กลับ Dashboard
+            <a href="dashboard.html" class="btn-secondary" style="padding:8px 16px; font-size:0.8rem;">
+                <span class="material-symbols-rounded">arrow_back</span> กลับ
             </a>
         </div>
 
-        <div class="glass-card">
-            <div class="form-group">
-                <label class="form-label">วาง User UID ที่ต้องการให้ยศ</label>
-                <input type="text" id="target-uid" class="form-input" placeholder="ตัวอย่าง: qqzXIApGiHVh2r78spN1BeZ7Qzz2">
-            </div>
-            <button id="btn-grant" class="btn-grant">
-                <span class="material-symbols-rounded">verified_user</span> ให้ยศแอดมิน
-            </button>
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; line-height: 1.5;">
-                * แอดมินจะสามารถเข้าใช้งานได้ทุกเทมเพลต (Extreme) แต่จะไม่เห็นหน้า "จัดการการเงิน"
-            </p>
-        </div>
-
-        <div class="admin-list" id="admin-list">
-            <h4 style="margin-bottom: 12px;">รายชื่อแอดมินทั้งหมด</h4>
-            <div id="list-container">
-                <!-- Data will be loaded here -->
-            </div>
+        <div class="admin-list">
+            <h4 style="margin-bottom: 12px; font-size: 1rem;">รายชื่อผู้ใช้ทั้งหมด</h4>
+            <div id="list-container"></div>
         </div>
     </div>
 
@@ -104,11 +92,11 @@
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
         import { collection, query, where, getDocs, doc, setDoc, deleteField, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
+        // IMPORTANT: Update this with the real Super Admin UID!
         const SUPER_ADMIN_UID = 'qqzXIApGiHVh2r78spN1BeZ7Qzz2';
         const overlay = document.getElementById('loading-overlay');
         const listContainer = document.getElementById('list-container');
-        const targetInput = document.getElementById('target-uid');
-        const grantBtn = document.getElementById('btn-grant');
+        const modalList = document.getElementById('modal-list');
 
         onAuthStateChanged(auth, (user) => {
             if (!user || user.uid !== SUPER_ADMIN_UID) {
@@ -116,31 +104,49 @@
                 window.location.href = 'index.html';
                 return;
             }
-            loadAdmins();
+            loadUsers();
         });
 
-        async function loadAdmins() {
+        async function loadUsers() {
             listContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">กำลังโหลด...</p>';
             try {
-                const q = query(collection(db, 'users'), where('role', '==', 'admin'));
+                const q = query(collection(db, 'users')); // Fetch all users!
                 const snap = await getDocs(q);
                 
                 if (snap.empty) {
-                    listContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">ยังไม่มีแอดมินท่านอื่น</p>';
+                    listContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">ยังไม่มีผู้ใช้งาน</p>';
                     return;
                 }
 
                 listContainer.innerHTML = '';
                 snap.forEach(d => {
                     const data = d.data();
+                    const isSuper = d.id === SUPER_ADMIN_UID;
+                    const isAdmin = data.role === 'admin';
+                    const roleBadge = isSuper ? '<span style="color:#FCD34D; font-size:0.75rem; border:1px solid #FCD34D; padding:2px 6px; border-radius:4px; margin-left:8px;">Super Admin</span>' : 
+                                    isAdmin ? '<span style="color:#34D399; font-size:0.75rem; border:1px solid #34D399; padding:2px 6px; border-radius:4px; margin-left:8px;">Admin</span>' : '';
+
+                    const btnRole = isAdmin 
+                        ? `<button class="btn-action btn-revoke" onclick="toggleAdmin('${d.id}', false)">ถอดแอดมิน</button>`
+                        : `<button class="btn-action btn-grant" onclick="toggleAdmin('${d.id}', true)">ยศแอดมิน</button>`;
+
                     const item = document.createElement('div');
                     item.className = 'admin-item';
                     item.innerHTML = `
-                        <div class="admin-item-info">
-                            <div style="font-weight:700; font-size:0.95rem;">${data.name || 'ไม่ทราบชื่อ'}</div>
-                            <div class="admin-uid">${d.id}</div>
+                        <div class="admin-item-info" style="flex-direction:row; align-items:center; gap:8px;">
+                            <div>
+                                <div style="font-weight:700; font-size:0.95rem; display:flex; align-items:center;">
+                                    ${data.name || data.email || 'ผู้ใช้ไร้ชื่อ'} ${roleBadge}
+                                </div>
+                                <div class="admin-uid" style="margin-top:2px;">${data.email || ''} <br> UID: ${d.id}</div>
+                            </div>
                         </div>
-                        <button class="btn-revoke" onclick="revokeAdmin('${d.id}')">ถอนสิทธิ์</button>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn-action" style="flex:1;" onclick="viewUserSurprises('${d.id}', '${data.name || 'ผู้ใช้'}')">
+                                <span class="material-symbols-rounded" style="font-size:1rem; vertical-align:middle;">visibility</span> ดูผลงาน
+                            </button>
+                            ${!isSuper ? btnRole : ''}
+                        </div>
                     `;
                     listContainer.appendChild(item);
                 });
@@ -150,23 +156,16 @@
             }
         }
 
-        grantBtn.onclick = async () => {
-            const uid = targetInput.value.trim();
-            if (!uid) return;
-            if (uid === SUPER_ADMIN_UID) {
-                alert('UID นี้เป็น Super Admin อยู่แล้ว');
-                return;
-            }
-
+        window.toggleAdmin = async (uid, grant) => {
+            if (!confirm(grant ? 'ยืนยันมอบอำนาจแอดมินให้บัญชีนี้?' : 'ยืนยันถอดสิทธิ์แอดมิน?')) return;
             overlay.style.display = 'flex';
             try {
-                await setDoc(doc(db, 'users', uid), { 
-                    role: 'admin',
-                    tier: 'extreme' // แอดมินมักจะได้ Extreme อยู่แล้ว
-                }, { merge: true });
-                targetInput.value = '';
-                alert('ให้ยศแอดมินเรียบร้อยแล้ว');
-                loadAdmins();
+                if (grant) {
+                    await setDoc(doc(db, 'users', uid), { role: 'admin', tier: 'extreme' }, { merge: true });
+                } else {
+                    await updateDoc(doc(db, 'users', uid), { role: deleteField() });
+                }
+                loadUsers();
             } catch (e) {
                 alert('เกิดข้อผิดพลาด: ' + e.message);
             } finally {
@@ -174,18 +173,39 @@
             }
         };
 
-        window.revokeAdmin = async (uid) => {
-            if (!confirm('ยืนยันถอนสิทธิ์แอดมิน?')) return;
-            overlay.style.display = 'flex';
+        window.viewUserSurprises = async (uid, name) => {
+            document.getElementById('modal-title').textContent = 'ผลงานของ: ' + name;
+            modalList.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">กำลังค้นหา...</p>';
+            document.getElementById('surprise-modal').style.display = 'flex';
+
             try {
-                await updateDoc(doc(db, 'users', uid), { 
-                    role: deleteField() 
+                const q = query(collection(db, 'surprises'), where('uid', '==', uid));
+                const snap = await getDocs(q);
+                if (snap.empty) {
+                    modalList.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">ผู้ใช้นี้ยังไม่ได้สร้างผลงานไว้เลย</p>';
+                    return;
+                }
+                
+                modalList.innerHTML = '';
+                snap.forEach(d => {
+                    const data = d.data();
+                    const bUrl = window.location.href.split('/').slice(0,-1).join('/') + '/view.html?id=' + d.id;
+                    const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('th-TH') : 'ไม่ทราบวันที่';
+                    
+                    const el = document.createElement('div');
+                    el.className = 'surprise-card';
+                    el.innerHTML = `
+                        <div style="font-weight:700; font-size:0.95rem; margin-bottom:4px; color:var(--primary);">ผู้รับ: ${data.receiver || '?'}</div>
+                        <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">เทมเพลต: ${data.template} | เข้าชม: ${data.views||0} | สร้าง: ${date}</div>
+                        <a href="${bUrl}" target="_blank" class="btn-action" style="text-decoration:none; display:inline-block; margin-right:8px; border-color:var(--primary); color:white; background:var(--primary);">
+                            <span class="material-symbols-rounded" style="font-size:1rem; vertical-align:middle;">open_in_new</span> เปิดดู
+                        </a>
+                    `;
+                    modalList.appendChild(el);
                 });
-                loadAdmins();
-            } catch (e) {
-                alert('เกิดข้อผิดพลาด: ' + e.message);
-            } finally {
-                overlay.style.display = 'none';
+            } catch(e) {
+                console.error(e);
+                modalList.innerHTML = '<p style="color:#f87171;">ดึงข้อมูลล้มเหลว (คุณอาจต้องสร้าง Index บน Firebase ถ้าใช้หลาย Queryร่วมกัน)</p>';
             }
         };
     </script>
