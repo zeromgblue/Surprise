@@ -224,6 +224,7 @@ header {
 
 /* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
+  html { font-size: 15px; }
   .hero-title { font-size: 2.5rem; line-height: 1.2; }
   .hero-subtitle { font-size: 1rem; padding: 0 10px; }
   .hero-section { padding: 60px 0; }
@@ -237,4 +238,14 @@ header {
   .template-grid { grid-template-columns: 1fr; gap: 20px; }
   .feature-grid { grid-template-columns: 1fr; gap: 16px; margin-top: 40px; }
   .cta-section { padding: 40px 20px; }
+}
+
+@media (max-width: 480px) {
+  html { font-size: 13.5px; } /* Scales down all REM units */
+  .hero-title { font-size: 2.2rem; }
+  .glass-card { padding: 1.2rem; border-radius: 16px; }
+  .container { padding: 0 0.8rem; }
+  .btn-primary, .btn-secondary { font-size: 0.85rem; padding: 8px 16px; }
+  .cta-section { padding: 30px 16px; }
+  .logo { font-size: 1.1rem; }
 }
