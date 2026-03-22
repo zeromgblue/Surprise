@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,119 +11,377 @@
     <link rel="dns-prefetch" href="https://www.gstatic.com">
     <link rel="dns-prefetch" href="https://firestore.googleapis.com">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
-        body { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; min-height:100vh; padding:20px; box-sizing:border-box; }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
 
-        .pay-wrap { max-width:480px; width:100%; margin:0 auto; }
+        .pay-wrap {
+            max-width: 480px;
+            width: 100%;
+            margin: 0 auto;
+        }
 
         /* Header */
-        .pay-header { text-align:center; padding:30px 0 20px; }
-        .pay-logo { display:flex;align-items:center;justify-content:center;gap:8px;color:var(--text-muted);font-size:0.85rem;margin-bottom:24px;text-decoration:none; }
-        .pay-logo:hover { color:white; }
-        .pay-tier-badge {
-            display:inline-flex;align-items:center;gap:8px;
-            padding:8px 20px; border-radius:50px; font-weight:700;
-            font-size:1rem; margin-bottom:12px;
+        .pay-header {
+            text-align: center;
+            padding: 30px 0 20px;
         }
-        .badge-std { background:linear-gradient(135deg,#FF3366,#9333EA); color:white; }
-        .badge-ext { background:linear-gradient(135deg,#F59E0B,#EF4444); color:white; box-shadow:0 0 20px rgba(245,158,11,0.4); }
-        .pay-amount { font-size:3.5rem; font-weight:800; font-family:'Outfit',sans-serif; color:white; }
-        .pay-amount span { font-size:1.5rem; font-weight:400; color:var(--text-muted); }
-        .pay-desc { color:var(--text-muted); font-size:0.9rem; margin-top:6px; }
+
+        .pay-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+            text-decoration: none;
+        }
+
+        .pay-logo:hover {
+            color: white;
+        }
+
+        .pay-tier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        .badge-std {
+            background: linear-gradient(135deg, #FF3366, #9333EA);
+            color: white;
+        }
+
+        .badge-ext {
+            background: linear-gradient(135deg, #F59E0B, #EF4444);
+            color: white;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .pay-amount {
+            font-size: 3.5rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            color: white;
+        }
+
+        .pay-amount span {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .pay-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 6px;
+        }
 
         /* Steps indicator */
-        .steps { display:flex;align-items:center;justify-content:center;gap:8px;margin:24px 0; }
-        .step-dot { width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15); transition:all 0.3s; }
-        .step-dot.active { background:#FF3366;width:24px;border-radius:4px; }
-        .step-dot.done { background:rgba(255,255,255,0.4); }
+        .steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 24px 0;
+        }
+
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            transition: all 0.3s;
+        }
+
+        .step-dot.active {
+            background: #FF3366;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .step-dot.done {
+            background: rgba(255, 255, 255, 0.4);
+        }
 
         /* Cards */
-        .pay-card { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:28px;margin-bottom:16px; position: relative; }
-        .pay-card-title { font-weight:700;font-size:1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px; }
-        .pay-card-title .material-symbols-rounded { color:#FF3366;font-size:1.1rem;font-variation-settings:'FILL' 1; }
+        .pay-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .pay-card-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pay-card-title .material-symbols-rounded {
+            color: #FF3366;
+            font-size: 1.1rem;
+            font-variation-settings: 'FILL' 1;
+        }
 
         /* QR Box */
         .qr-box {
-            display:flex;flex-direction:column;align-items:center;gap:16px;
-            padding:24px; background:white; border-radius:16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 24px;
+            background: white;
+            border-radius: 16px;
         }
-        .qr-img { width:220px;height:220px;border-radius:8px;display:block; }
+
+        .qr-img {
+            width: 220px;
+            height: 220px;
+            border-radius: 8px;
+            display: block;
+        }
+
         .qr-placeholder {
-            width:220px;height:220px;border-radius:8px;
-            background:linear-gradient(135deg,#f3f4f6,#e5e7eb);
-            display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+            width: 220px;
+            height: 220px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .qr-to { color:#111;font-size:0.85rem;font-weight:600;text-align:center; }
-        .qr-amount-label { 
-            display:inline-flex;align-items:center;gap:6px;
-            background:linear-gradient(135deg,#FF3366,#9333EA);
-            color:white;padding:6px 16px;border-radius:50px;
-            font-size:1rem;font-weight:700;
+
+        .qr-to {
+            color: #111;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .qr-amount-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #FF3366, #9333EA);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
         }
 
         /* Form fields */
-        .pay-input { width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:white;font-size:0.9rem;font-family:'Inter',sans-serif;box-sizing:border-box;outline:none;transition:border-color 0.2s; }
-        .pay-input:focus { border-color:rgba(255,51,102,0.6); }
-        .pay-input::placeholder { color:rgba(255,255,255,0.25); }
-        .pay-label { font-size:0.82rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:600; }
+        .pay-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .pay-input:focus {
+            border-color: rgba(255, 51, 102, 0.6);
+        }
+
+        .pay-input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .pay-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: block;
+            font-weight: 600;
+        }
 
         /* Submit btn */
         .pay-submit-btn {
-            width:100%;padding:16px;border-radius:14px;border:none;cursor:pointer;
-            font-size:1rem;font-weight:700;font-family:'Inter',sans-serif;
-            color:white;background:linear-gradient(135deg,#FF3366,#9333EA);
-            box-shadow:0 0 30px rgba(255,51,102,0.4);
-            transition:all 0.2s ease;display:flex;align-items:center;justify-content:center;gap:8px;
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            background: linear-gradient(135deg, #FF3366, #9333EA);
+            box-shadow: 0 0 30px rgba(255, 51, 102, 0.4);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .pay-submit-btn:hover:not(:disabled) { transform:translateY(-2px);box-shadow:0 8px 40px rgba(255,51,102,0.6); }
-        .pay-submit-btn:disabled { opacity:0.5;cursor:not-allowed; }
+
+        .pay-submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(255, 51, 102, 0.6);
+        }
+
+        .pay-submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
         /* Success screen */
-        #success-screen { display:none;text-align:center;padding:40px 20px; }
-        #success-screen.show { display:block;animation:fadeInUp 0.6s ease; }
-        .success-ring { width:80px;height:80px;border-radius:50%;background:rgba(74,222,128,0.1);border:2px solid rgba(74,222,128,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 24px; }
-        
-        .id-badge {
-            background: rgba(255,255,255,0.07);
-            border: 1px dashed rgba(255,255,255,0.2);
-            padding: 16px; border-radius: 16px;
-            margin: 20px 0; position: relative;
+        #success-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
         }
-        .id-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; display: block; }
-        .id-value { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--primary); letter-spacing: 2px; }
+
+        #success-screen.show {
+            display: block;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .success-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(74, 222, 128, 0.1);
+            border: 2px solid rgba(74, 222, 128, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .id-badge {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            padding: 16px;
+            border-radius: 16px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .id-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .id-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
 
         .contact-box {
             background: linear-gradient(135deg, rgba(0, 210, 255, 0.1), rgba(107, 33, 168, 0.1));
             border: 1px solid rgba(0, 210, 255, 0.2);
-            padding: 20px; border-radius: 16px; margin-top: 24px; text-align: left;
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 24px;
+            text-align: left;
         }
 
-        @keyframes fadeInUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
-        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Loading Overlay */
         #loading-overlay {
-            position: fixed; inset: 0; background: rgba(8, 8, 8, 0.9);
-            backdrop-filter: blur(15px); z-index: 3000;
-            display: none; align-items: center; justify-content: center; flex-direction: column;
-            gap: 24px; animation: fadeIn 0.3s ease;
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 8, 8, 0.9);
+            backdrop-filter: blur(15px);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.3s ease;
         }
+
         .loader-ring {
-            width: 80px; height: 80px; position: relative;
-            display: flex; align-items: center; justify-content: center;
+            width: 80px;
+            height: 80px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         .loader-ring::before {
-            content: ""; position: absolute; inset: 0;
-            border-radius: 50%; border: 4px solid rgba(255, 51, 102, 0.1);
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 51, 102, 0.1);
             border-top: 4px solid #FF3366;
             animation: spin 1s linear infinite;
         }
-        #loading-text { font-weight: 700; font-size: 1.2rem; color: white; text-align: center; }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #loading-text {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
+
 <body>
     <!-- Loading Overlay -->
     <div id="loading-overlay">
@@ -151,7 +410,8 @@
         <div id="pay-form">
             <!-- Instructions Card -->
             <div class="pay-card" style="border-color: rgba(74, 222, 128, 0.3); background: rgba(74, 222, 128, 0.03);">
-                <div class="pay-card-title" style="color:#4ade80;"><span class="material-symbols-rounded">info</span> ขั้นตอนการสั่งซื้อ</div>
+                <div class="pay-card-title" style="color:#4ade80;"><span class="material-symbols-rounded">info</span>
+                    ขั้นตอนการสั่งซื้อ</div>
                 <div style="font-size:0.85rem; color:white; line-height:1.7;">
                     1. ชำระเงินผ่าน TrueMoney Wallet <br>
                     2. กรอกชื่อและกดปุ่มด้านล่างเพื่อ <b>รับเลข ID สินค้า</b> <br>
@@ -166,15 +426,20 @@
                     <span style="font-size:1.3rem;">🧡</span> TrueMoney Wallet
                 </div>
                 <div class="qr-box" style="background:linear-gradient(135deg,#fff8f5,#fff);border:2px solid #FF660022;">
-                    <div style="background:#FF6600;color:white;padding:6px 20px;border-radius:20px;font-size:0.8rem;font-weight:700;letter-spacing:1px;">TRUE MONEY WALLET</div>
+                    <div
+                        style="background:#FF6600;color:white;padding:6px 20px;border-radius:20px;font-size:0.8rem;font-weight:700;letter-spacing:1px;">
+                        TRUE MONEY WALLET</div>
                     <img id="qr-img" class="qr-img" alt="QR TrueMoney" style="display:none;">
-                    <div class="qr-placeholder" id="qr-placeholder" style="background:linear-gradient(135deg,#fff4ed,#ffe8d6);">
+                    <div class="qr-placeholder" id="qr-placeholder"
+                        style="background:linear-gradient(135deg,#fff4ed,#ffe8d6);">
                         <span style="font-size:3rem;">🧡</span>
                         <span style="color:#9a6038;font-size:0.8rem;">กำลังโหลด QR...</span>
                     </div>
                     <div class="qr-to" style="color:#333;">โอนเงินมาที่เบอร์</div>
-                    <div style="color:#FF6600;font-size:1.4rem;font-weight:800;letter-spacing:3px;" id="qr-phone">0800823401</div>
-                    <div style="background:#FF6600;color:white;padding:6px 20px;border-radius:50px;font-size:1rem;font-weight:700;">
+                    <div style="color:#FF6600;font-size:1.4rem;font-weight:800;letter-spacing:3px;" id="qr-phone">
+                        0800823401</div>
+                    <div
+                        style="background:#FF6600;color:white;padding:6px 20px;border-radius:50px;font-size:1rem;font-weight:700;">
                         ฿<span id="qr-amount-lbl">20</span> บาท
                     </div>
                 </div>
@@ -205,10 +470,12 @@
         <!-- Success Screen -->
         <div id="success-screen">
             <div class="success-ring">
-                <span class="material-symbols-rounded" style="font-size:2.5rem;color:#4ade80;font-variation-settings:'FILL' 1;">check_circle</span>
+                <span class="material-symbols-rounded"
+                    style="font-size:2.5rem;color:#4ade80;font-variation-settings:'FILL' 1;">check_circle</span>
             </div>
             <h2 style="font-size:1.6rem;margin-bottom:8px;">คำสั่งซื้อถูกบันทึกแล้ว!</h2>
-            <p style="color:var(--text-muted);font-size:0.9rem;">กรุณา <b style="color:white;">แคปหน้าจอนี้</b> หรือจดจำเลข ID ด้านล่างไว้</p>
+            <p style="color:var(--text-muted);font-size:0.9rem;">กรุณา <b style="color:white;">แคปหน้าจอนี้</b>
+                หรือจดจำเลข ID ด้านล่างไว้</p>
 
             <div class="id-badge">
                 <span class="id-label">เลข ID สินค้าของคุณ (ORDER ID)</span>
@@ -224,13 +491,15 @@
                     ส่งเลข ID นี้ไปที่ <b style="color:#FF3366;">IG: zerostudio0.1</b> <br>
                     เพื่อให้แอดมินทำการเปิดระบบให้คุณทันทีครับ
                 </div>
-                <a href="https://www.instagram.com/zerostudio0.1/" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:8px; background:white; color:black; padding:12px; border-radius:12px; margin-top:20px; text-decoration:none; font-weight:700; font-size:0.9rem;">
+                <a href="https://www.instagram.com/zerostudio0.1/" target="_blank"
+                    style="display:flex; align-items:center; justify-content:center; gap:8px; background:white; color:black; padding:12px; border-radius:12px; margin-top:20px; text-decoration:none; font-weight:700; font-size:0.9rem;">
                     ส่งข้อความทาง IG ทันที
                 </a>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:12px;margin-top:30px;">
-                <a href="dashboard.html" class="btn-secondary" style="text-align:center;padding:12px; border-color:rgba(255,255,255,0.1);">
+                <a href="dashboard.html" class="btn-secondary"
+                    style="text-align:center;padding:12px; border-color:rgba(255,255,255,0.1);">
                     <span class="material-symbols-rounded">dashboard</span> ไปที่ Dashboard
                 </a>
             </div>
@@ -250,7 +519,7 @@
 
         const tiers = {
             standard: { label: 'Standard Package', icon: 'star', badgeClass: 'badge-std', amount: 20, desc: 'ปลดล็อก 30+ เทมเพลตพรีเมียม สวยมีสไตล์' },
-            extreme:  { label: 'EXTREME Package',  icon: 'diamond', badgeClass: 'badge-ext', amount: 120, desc: 'ปลดล็อก 100+ เทมเพลต 3D และ VIP ทั้งหมด' }
+            extreme: { label: 'EXTREME Package', icon: 'diamond', badgeClass: 'badge-ext', amount: 120, desc: 'ปลดล็อก 100+ เทมเพลต 3D และ VIP ทั้งหมด' }
         };
         const t = tiers[tier] || tiers.standard;
 
@@ -262,8 +531,8 @@
         document.getElementById('qr-amount-lbl').textContent = t.amount;
 
         const qrImg = document.getElementById('qr-img');
-        const qrPh  = document.getElementById('qr-placeholder');
-        qrImg.onload = () => { qrImg.style.display='block'; qrPh.style.display='none'; };
+        const qrPh = document.getElementById('qr-placeholder');
+        qrImg.onload = () => { qrImg.style.display = 'block'; qrPh.style.display = 'none'; };
         qrImg.src = './images/truemoney_qr.png';
 
         const submitBtn = document.getElementById('submitBtn');
@@ -291,7 +560,7 @@
                 overlay.style.display = 'none';
                 document.getElementById('pay-form').style.display = 'none';
                 document.getElementById('success-screen').classList.add('show');
-                
+
                 // Show a clear ID (Firestore Doc ID is unique and consistent)
                 const finalId = docRef.id.substring(0, 10).toUpperCase();
                 document.getElementById('final-id').textContent = finalId;
@@ -305,4 +574,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -1,86 +1,176 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ดูตัวอย่าง | Surprise Me</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
-        body { margin:0; overflow-x:hidden; min-height:100vh; background:var(--background); }
+        body {
+            margin: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background: var(--background);
+        }
 
         /* Top bar */
         .preview-bar {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-            background: rgba(10,10,10,0.85); backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             padding: 10px 20px;
-            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
+
         .preview-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: linear-gradient(135deg,#FF3366,#9333EA);
-            color: white; font-size: 0.75rem; font-weight: 700;
-            padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #FF3366, #9333EA);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+
         .preview-label {
-            color: rgba(255,255,255,0.5); font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.82rem;
         }
-        .preview-actions { display: flex; gap: 8px; align-items: center; }
+
+        .preview-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
         .preview-btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 7px 16px; border-radius: 10px; font-size: 0.82rem; font-weight: 600;
-            cursor: pointer; border: none; transition: all 0.2s ease; font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
             text-decoration: none;
         }
+
         .preview-btn-back {
-            background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7);
-            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
-        .preview-btn-back:hover { background: rgba(255,255,255,0.12); color: white; }
+
+        .preview-btn-back:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
         .preview-btn-create {
-            background: linear-gradient(135deg,#FF3366,#9333EA);
-            color: white; box-shadow: 0 0 20px rgba(255,51,102,0.4);
+            background: linear-gradient(135deg, #FF3366, #9333EA);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);
         }
-        .preview-btn-create:hover { transform: translateY(-1px); box-shadow: 0 5px 25px rgba(255,51,102,0.6); }
+
+        .preview-btn-create:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 25px rgba(255, 51, 102, 0.6);
+        }
 
         /* Content area with top padding for the bar */
         #preview-content {
-            width: 100%; min-height: 100vh;
+            width: 100%;
+            min-height: 100vh;
             padding-top: 56px;
             box-sizing: border-box;
         }
 
         /* Loading */
         #loading-overlay {
-            position: fixed; inset: 0; z-index: 9998;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
             background: var(--background);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
             transition: opacity 0.5s ease;
         }
-        #loading-overlay.out { opacity: 0; pointer-events: none; }
-        .load-ring {
-            width: 40px; height: 40px; border: 2px solid rgba(255,255,255,0.1);
-            border-top-color: #FF3366; border-radius: 50%; animation: spin 0.8s linear infinite;
+
+        #loading-overlay.out {
+            opacity: 0;
+            pointer-events: none;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .load-ring {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #FF3366;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         /* Template name chip */
         .tpl-chip {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.6); font-size: 0.78rem; padding: 3px 10px;
-            border-radius: 20px; max-width: 200px; overflow: hidden;
-            white-space: nowrap; text-overflow: ellipsis;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.78rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            max-width: 200px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
-        .tpl-chip .material-symbols-rounded { font-size: 0.85rem; font-variation-settings: 'FILL' 1; }
+
+        .tpl-chip .material-symbols-rounded {
+            font-size: 0.85rem;
+            font-variation-settings: 'FILL' 1;
+        }
 
         @media (max-width: 480px) {
-            .preview-label { display: none; }
-            .tpl-chip { max-width: 120px; }
+            .preview-label {
+                display: none;
+            }
+
+            .tpl-chip {
+                max-width: 120px;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <!-- Preview Bar (always on top) -->
@@ -121,16 +211,16 @@
         import { getTemplateById } from './templates-data.js';
 
         const params = new URLSearchParams(window.location.search);
-        const tplId    = params.get('tpl')      || 'romantic';
+        const tplId = params.get('tpl') || 'romantic';
         const receiver = params.get('receiver') || 'ผู้รับ';
-        const message  = params.get('message')  || 'ข้อความทดสอบ ❤️';
-        const sender   = params.get('sender')   || 'ผู้ส่ง';
-        const privacy  = params.get('privacy')  || 'multi';
-        const tier     = params.get('tier')     || 'free';
+        const message = params.get('message') || 'ข้อความทดสอบ ❤️';
+        const sender = params.get('sender') || 'ผู้ส่ง';
+        const privacy = params.get('privacy') || 'multi';
+        const tier = params.get('tier') || 'free';
 
         const tpl = getTemplateById(tplId);
         const container = document.getElementById('preview-content');
-        const loading   = document.getElementById('loading-overlay');
+        const loading = document.getElementById('loading-overlay');
 
         // Update chip in bar
         document.getElementById('tplIcon').textContent = tpl.icon;
@@ -147,8 +237,8 @@
         const previewData = {
             template: tplId,
             receiver: decodeURIComponent(receiver),
-            message:  decodeURIComponent(message),
-            sender:   decodeURIComponent(sender),
+            message: decodeURIComponent(message),
+            sender: decodeURIComponent(sender),
             privacy,
             views: 0,
             analytics: false,  // hide view count in preview
@@ -159,7 +249,7 @@
                 const folder = tpl.part ? `./templates_${tpl.part}` : './templates';
                 const mod = await import(`${folder}/tpl-${tpl.id}.js`);
                 await mod.render(container, previewData, tpl);
-            } catch(e) {
+            } catch (e) {
                 console.warn('Template JS not found, using classic fallback:', e.message);
                 renderClassicFallback(container, previewData, tpl);
             } finally {
@@ -196,10 +286,11 @@
         }
 
         function escHtml(s = '') {
-            return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
         loadTemplate();
     </script>
 </body>
+
 </html>
