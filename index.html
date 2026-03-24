@@ -248,7 +248,7 @@
                 ไม่มีหมดอายุ ปลอดภัย 100% </p>
             <div class="fade-in"
                 style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation-delay: 0.6s;"> <a
-                    href="showcase.html" class="btn-primary"> <span class="material-symbols-rounded">add_circle</span>
+                    href="creator.html" class="btn-primary"> <span class="material-symbols-rounded">add_circle</span>
                     เริ่มสร้างเซอร์ไพรส์เลย </a> <a href="dashboard.html" class="btn-secondary" id="hero-dash-btn"
                     style="display:none;"> <span class="material-symbols-rounded">grid_view</span> ดูผลงานของฉัน </a>
             </div>
@@ -259,7 +259,7 @@
                 </div>
                 <div class="stat">
                     <div class="stat-num">132</div>
-                    <div class="stat-label">เทมเพลตพรีเมียม</div>
+                    <div class="stat-label">เทมเพลตทั้งหมด</div>
                 </div>
             </div>
         </section> <!-- How It Works -->
@@ -296,9 +296,9 @@
                 <div style="text-align:center; grid-column:1/-1; padding:40px; color:var(--text-muted);">
                     กำลังโหลดเทมเพลต...</div>
             </div>
-            <div style="text-align:center; margin-top:40px;"> <a href="showcase.html" class="btn-secondary"
+            <div style="text-align:center; margin-top:40px;"> <a href="creator.html" class="btn-secondary"
                     style="display:inline-flex; align-items:center; gap:8px; padding:12px 28px; font-size:1rem; border-radius:50px;">
-                    <span class="material-symbols-rounded">view_carousel</span> เลือกแพ็กเกจทั้งหมด </a> </div>
+                    <span class="material-symbols-rounded">view_carousel</span> ดูเทมเพลตทั้งหมด </a> </div>
         </section> <!-- Features -->
         <section style="padding: 100px 0;">
             <h2 style="font-size: 2.5rem; text-align: center; margin-bottom: 16px;" class="fade-in">
@@ -340,9 +340,9 @@
                 style="font-size: 3rem; color: var(--primary);">favorite</span>
             <h2 style="font-size: 2.2rem; margin: 16px 0 12px;">พร้อมสร้างเซอร์ไพรส์แล้วหรือยัง?</h2>
             <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 32px; line-height: 1.7;">
-                ไม่ต้องสมัครก็ใช้ได้ แต่ถ้า Login จะจัดการเซอร์ไพรส์ของคุณได้ง่ายกว่า</p> <a href="showcase.html"
+                ไม่ต้องสมัครก็ใช้ได้ แต่ถ้า Login จะจัดการเซอร์ไพรส์ของคุณได้ง่ายกว่า</p> <a href="creator.html"
                 class="btn-primary" style="font-size: 1.05rem; padding: 14px 36px;"> <span
-                    class="material-symbols-rounded">add_circle</span> เลือกแพ็กเกจของคุณ </a>
+                    class="material-symbols-rounded">add_circle</span> เริ่มสร้างเซอร์ไพรส์เลย </a>
         </div>
         <footer
             style="margin-top: 60px; padding: 40px 0; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; color: var(--text-muted); font-size: 0.9rem; gap: 16px; flex-wrap: wrap;">
@@ -394,15 +394,14 @@
                 return `
                 <div class="glass-card template-item">
                     <div style="height:120px; background:linear-gradient(135deg, ${t.from}15, ${t.to}15); margin:-28px -28px 24px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid ${t.from}33; position:relative; overflow:hidden;">
-                        ${is3D ? `<div style="position:absolute; top:12px; right:12px; background:linear-gradient(135deg, #F59E0B, #EF4444); color:white; font-size:0.6rem; font-weight:900; padding:2px 8px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:2;">PRO 3D</div>` : ''}
-                        ${t.tier === 'free' ? `<div style="position:absolute; top:12px; left:12px; background:rgba(16, 185, 129, 0.2); border:1px solid rgba(16, 185, 129, 0.4); color:#10b981; font-size:0.6rem; font-weight:800; padding:2px 8px; border-radius:10px; z-index:2;">FREE</div>` : ''}
+                        ${is3D ? `<div style="position:absolute; top:12px; right:12px; background:linear-gradient(135deg, #F59E0B, #EF4444); color:white; font-size:0.6rem; font-weight:900; padding:2px 8px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:2;">3D</div>` : ''}
                         <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,${t.from},${t.to});display:flex;align-items:center;justify-content:center;box-shadow:0 10px 20px rgba(0,0,0,0.3);">
                             <span class="material-symbols-rounded" style="color:white;font-variation-settings:'FILL' 1;font-size:2rem;">${t.icon}</span>
                         </div>
                     </div>
                     <h3 style="display:flex;align-items:center;gap:8px;"><span class="material-symbols-rounded" style="color:${t.from};font-variation-settings:'FILL' 1;font-size:1.2rem;">${t.icon}</span> ${t.nameTh || t.name}</h3>
                     <p style="color: var(--text-muted); margin: 8px 0 20px; font-size: 0.85rem; line-height: 1.6; height: 3em; overflow:hidden;"> ${t.desc} </p>
-                    <a href="creator.html?tier=${t.tier}&tpl=${t.id}" class="btn-primary" style="width: 100%; justify-content: center;">
+                    <a href="creator.html?tpl=${t.id}" class="btn-primary" style="width: 100%; justify-content: center;">
                         <span class="material-symbols-rounded">magic_button</span> ลองใช้เลย
                     </a>
                 </div>

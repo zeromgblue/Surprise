@@ -675,22 +675,7 @@
     </nav>
 
     <div class="creator-main">
-        <!-- Tier Indicator -->
-        <div id="tier-banner"
-            style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span class="material-symbols-rounded" id="tier-icon"
-                    style="color: var(--text-muted); font-size: 2rem;">inventory_2</span>
-                <div>
-                    <h3 id="tier-display-name" style="margin: 0; font-size: 1.1rem;">แพ็กเกจ: ฟรี (Free)</h3>
-                    <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
-                        กำลังใช้งานคุณสมบัติและเทมเพลตตามแพ็กเกจที่คุณเลือก</p>
-                </div>
-            </div>
-            <a href="showcase.html" class="btn-secondary" style="font-size: 0.85rem; padding: 8px 16px;">
-                <span class="material-symbols-rounded" style="font-size: 1rem;">swap_horiz</span> เปลียนแพ็กเกจ
-            </a>
-        </div>
+
 
         <!-- Step Indicator -->
         <div style="display:flex; align-items:center; gap: 0; margin-bottom: 36px; flex-wrap: wrap; gap: 8px;">
@@ -709,7 +694,7 @@
         <div class="step-pane active" id="step-1">
             <h1 style="font-size:1.6rem; margin-bottom:6px;">เลือกรูปแบบที่ใช่</h1>
             <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:24px;">
-                เทมเพลตเหล่านี้พร้อมให้คุณใช้งานได้ตามแพ็กเกจที่เลือก</p>
+                เทมเพลตทั้งหมดพร้อมให้คุณใช้งานได้ตามใจชอบ</p>
 
             <div class="category-chips" id="chips"></div>
             <div class="tpl-grid" id="tpl-grid"></div>
@@ -846,27 +831,7 @@
         </div>
     </div>
 
-    <!-- Upgrade Modal -->
-    <div class="modal-overlay" id="upgrade-modal">
-        <div class="modal-content">
-            <div
-                style="width:64px; height:64px; background:rgba(252,211,77,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;">
-                <span class="material-symbols-rounded" style="color:#FCD34D; font-size:2rem;">lock</span>
-            </div>
-            <h2 id="modal-title" style="margin-bottom:12px;">อัปเกรดเพื่อปลดล็อก</h2>
-            <p id="modal-text" style="color:var(--text-muted); font-size:0.9rem; line-height:1.6; margin-bottom:28px;">
-                เทมเพลตนี้เป็นส่วนหนึ่งของ <span id="tier-name"
-                    style="color:white; font-weight:700;">พรีเมียมแพ็กเกจ</span><br>
-                จ่ายเพียงครั้งเดียวเพื่อใช้งานได้ตลอดไป
-            </p>
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                <button class="btn-primary" onclick="window.location.href='showcase.html'"
-                    style="justify-content:center;">ดูแพ็กเกจทั้งหมด</button>
-                <button class="btn-secondary" onclick="closeModal()"
-                    style="justify-content:center; border:none; background:transparent;">ไว้ครั้งหน้า</button>
-            </div>
-        </div>
-    </div>
+
 
     <script type="module">
         import { auth, db } from './firebase-config.js';
@@ -955,52 +920,12 @@
         }
 
         function updateTierUI(tier, role) {
-            const bannerEl = document.getElementById('tier-banner');
-            const iconEl = document.getElementById('tier-icon');
-            const nameEl = document.getElementById('tier-display-name');
-
-            if (role === 'admin' || currentUser?.uid === SUPER_ADMIN_UID) {
-                bannerEl.style.background = 'linear-gradient(135deg, #FF3366, #9333EA)';
-                bannerEl.style.borderColor = 'rgba(255,51,102,0.5)';
-                iconEl.textContent = 'shield_with_heart';
-                iconEl.style.color = '#fff';
-                nameEl.textContent = 'ยศ: แอดมิน (Admin Mode)';
-                nameEl.style.color = '#fff';
-                bannerEl.classList.add('pulse');
-                return;
-            }
-
-            if (tier === 'extreme' || tier === 'premium') {
-                bannerEl.style.background = 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(239,68,68,0.1))';
-                bannerEl.style.borderColor = 'rgba(245,158,11,0.3)';
-                iconEl.textContent = 'diamond';
-                iconEl.style.color = '#F59E0B';
-                nameEl.textContent = 'แพ็กเกจ: EXTREME (120 บาท)';
-                nameEl.style.color = '#F59E0B';
-            } else if (tier === 'standard') {
-                bannerEl.style.background = 'linear-gradient(135deg, rgba(255,51,102,0.1), rgba(147,51,234,0.1))';
-                bannerEl.style.borderColor = 'rgba(255,51,102,0.3)';
-                iconEl.textContent = 'star';
-                iconEl.style.color = '#FF3366';
-                nameEl.textContent = 'แพ็กเกจ: STANDARD (20 บาท)';
-                nameEl.style.color = '#FF3366';
-            } else {
-                bannerEl.style.background = 'rgba(255,255,255,0.03)';
-                bannerEl.style.borderColor = 'rgba(255,255,255,0.08)';
-                iconEl.textContent = 'potted_plant';
-                iconEl.style.color = 'var(--text-muted)';
-                nameEl.textContent = 'แพ็กเกจ: ฟรี (Free)';
-                nameEl.style.color = 'var(--text-muted)';
-            }
+            // UI updated unconditionally
         }
 
         // Helper func to check access
         function hasAccess(tplTier, tier) {
-            if (tplTier === 'free') return true;
-            if (userRole === 'admin' || currentUser?.uid === SUPER_ADMIN_UID) return true; // Full access for admins
-            if (tier === 'extreme' || tier === 'premium') return tplTier === 'premium';
-            if (tier === 'standard') return tplTier === 'standard';
-            return false;
+            return true;
         }
 
 
@@ -1033,7 +958,7 @@
             }).join('');
 
             if (filtered.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">ไม่มีเทมเพลตในหมวดหมู่นี้สำหรับแพ็กเกจที่คุณเลือก</div>`;
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">ไม่มีเทมเพลตในหมวดหมู่นี้</div>`;
             }
         }
         renderGrid();
@@ -1050,14 +975,9 @@
         };
 
         function showUpgradeModal(tier) {
-            const modal = document.getElementById('upgrade-modal');
-            const tierName = document.getElementById('tier-name');
-            tierName.textContent = tier === 'standard' ? 'Standard (20 บาท)' : 'Extreme (120 บาท)';
-            modal.style.display = 'flex';
         }
 
         window.closeModal = () => {
-            document.getElementById('upgrade-modal').style.display = 'none';
         }
 
 
