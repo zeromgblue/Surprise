@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ดูตัวอย่าง | Surprise Me</title>
+    <title>ดูตัวอย่าง | Surpo</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪄</text></svg>">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
@@ -37,8 +39,8 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: linear-gradient(135deg, #FF3366, #9333EA);
-            color: white;
+            background: linear-gradient(135deg, #FAEDC0, #E6C97A);
+            color: #0D0D0D;
             font-size: 0.75rem;
             font-weight: 700;
             padding: 4px 12px;
@@ -85,14 +87,14 @@
         }
 
         .preview-btn-create {
-            background: linear-gradient(135deg, #FF3366, #9333EA);
-            color: white;
-            box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);
+            background: linear-gradient(135deg, #FAEDC0 0%, #E6C97A 48%, #D9BC62 100%);
+            color: #0D0D0D;
+            box-shadow: none;
         }
 
         .preview-btn-create:hover {
             transform: translateY(-1px);
-            box-shadow: 0 5px 25px rgba(255, 51, 102, 0.6);
+            background: linear-gradient(135deg, #FFF3D4 0%, #EBD088 48%, #E0C56E 100%);
         }
 
         /* Content area with top padding for the bar */
@@ -126,7 +128,7 @@
             width: 40px;
             height: 40px;
             border: 2px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #FF3366;
+            border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
@@ -187,7 +189,7 @@
         </div>
         <div class="preview-label">นี่คือลักษณะที่ผู้รับจะเห็น</div>
         <div class="preview-actions">
-            <button class="preview-btn preview-btn-back" onclick="history.back()">
+            <button class="preview-btn preview-btn-back" id="backBtn">
                 <span class="material-symbols-rounded" style="font-size:0.9rem;">arrow_back</span>
                 กลับแก้ไข
             </button>
@@ -276,7 +278,7 @@
                         </div>
                     </div>
                     <div style="text-align:center;margin-top:20px;">
-                        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,51,102,0.1);border:1px solid rgba(255,51,102,0.3);color:#FF3366;padding:8px 16px;border-radius:10px;font-size:0.8rem;">
+                        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(230,201,122,0.1);border:1px solid rgba(230,201,122,0.3);color:var(--accent);padding:8px 16px;border-radius:10px;font-size:0.8rem;">
                             <span class="material-symbols-rounded" style="font-size:0.9rem;">info</span>
                             เทมเพลตนี้ใช้ Classic Fallback — เวอร์ชัน 3D จะทำงานเมื่อ deploy จริง
                         </div>
@@ -290,6 +292,16 @@
         }
 
         loadTemplate();
+
+        // Back button: close preview tab (returns to creator) or navigate to creator
+        document.getElementById('backBtn').addEventListener('click', () => {
+            if (window.opener && !window.opener.closed) {
+                window.close();
+            } else {
+                const p = new URLSearchParams({ tier, t: tplId });
+                window.location.href = 'creator.html?' + p.toString();
+            }
+        });
     </script>
 </body>
 

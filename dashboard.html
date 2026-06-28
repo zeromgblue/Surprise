@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Zprise</title>
+    <title>Dashboard | Surpo</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪄</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://www.gstatic.com">
@@ -35,22 +37,16 @@
         }
 
         .sidebar-logo {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 700;
             font-size: 1.1rem;
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.08em;
+            color: var(--text);
             display: flex;
             align-items: center;
             gap: 8px;
             margin-bottom: 28px;
             padding: 0 8px;
-        }
-
-        .sidebar-logo .material-symbols-rounded {
-            -webkit-text-fill-color: var(--primary);
         }
 
         .nav-item {
@@ -78,8 +74,8 @@
         }
 
         .nav-item.active {
-            background: rgba(255, 51, 102, 0.12);
-            color: var(--primary);
+            background: rgba(230, 201, 122, 0.12);
+            color: var(--accent);
         }
 
         .nav-item .material-symbols-rounded {
@@ -111,7 +107,7 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            border: 2px solid var(--primary);
+            border: 2px solid var(--accent);
         }
 
         .user-sidebar-info {
@@ -180,9 +176,10 @@
         }
 
         .stat-card-num {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Kanit', sans-serif;
             font-size: 2rem;
-            font-weight: 800;
+            font-weight: 700;
+            color: var(--accent);
         }
 
         .stat-card-label {
@@ -209,7 +206,7 @@
 
         .surprise-card:hover {
             transform: translateY(-3px);
-            border-color: rgba(255, 51, 102, 0.3);
+            border-color: rgba(230, 201, 122, 0.35);
         }
 
         .card-template-badge {
@@ -226,9 +223,9 @@
         }
 
         .badge-romantic {
-            background: rgba(255, 51, 102, 0.15);
-            color: #FF6B9D;
-            border: 1px solid rgba(255, 51, 102, 0.3);
+            background: rgba(230, 201, 122, 0.12);
+            color: var(--accent);
+            border: 1px solid rgba(230, 201, 122, 0.35);
         }
 
         .badge-birthday {
@@ -357,9 +354,9 @@
         }
 
         .card-link-copy:hover {
-            background: rgba(0, 210, 255, 0.15);
+            background: rgba(230, 201, 122, 0.12);
             color: var(--accent);
-            border-color: rgba(0, 210, 255, 0.3);
+            border-color: rgba(230, 201, 122, 0.35);
         }
 
         .card-link-copy .material-symbols-rounded {
@@ -599,13 +596,14 @@
         }
 
         .header-logo {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 700;
             font-size: 1rem;
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.08em;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
     </style>
 </head>
@@ -614,7 +612,7 @@
     <!-- Mobile Header -->
     <header class="mobile-header">
         <button class="menu-btn" onclick="toggleSidebar()"><span class="material-symbols-rounded">menu</span></button>
-        <div class="header-logo">ZPRISE</div>
+        <div class="header-logo"><span class="logo-dot"></span> SURPO</div>
         <div style="width:44px;"></div> <!-- Spacer -->
     </header>
 
@@ -658,8 +656,7 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <a href="index.html" class="sidebar-logo" style="text-decoration:none;">
-                <span class="material-symbols-rounded">magic_button</span>
-                ZPRISE
+                <span class="logo-dot"></span> SURPO
             </a>
             <button class="nav-item active"
                 onclick="showSection('surprises'); if(window.innerWidth<=768) toggleSidebar();">
@@ -747,7 +744,7 @@
                 <div class="dash-header">
                     <div>
                         <h1 class="dash-title">วิธีใช้งาน</h1>
-                        <p class="dash-subtitle">คำแนะนำการใช้งาน Zprise Platform</p>
+                        <p class="dash-subtitle">คำแนะนำการใช้งาน Surpo Platform</p>
                     </div>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 20px; max-width: 680px;">
@@ -785,7 +782,7 @@
                 <button class="btn-secondary" style="flex:1; justify-content:center;"
                     onclick="closeDeleteModal()">ยกเลิก</button>
                 <button class="btn-primary"
-                    style="flex:1; justify-content:center; background:linear-gradient(135deg,#FF3366,#991B1B);"
+                    style="flex:1; justify-content:center;"
                     id="confirm-delete-btn">ลบเลย</button>
             </div>
         </div>
@@ -838,7 +835,7 @@
                 document.getElementById('dash-layout').style.display = 'grid';
 
                 // Sidebar User Info
-                document.getElementById('sidebar-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=FF3366&color=fff`;
+                document.getElementById('sidebar-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=E6C97A&color=111`;
                 document.getElementById('sidebar-name').textContent = user.displayName || 'ผู้ใช้';
                 document.getElementById('sidebar-email').textContent = user.email || '';
 
@@ -931,7 +928,7 @@
                 const t = getTemplateById(s.template);
                 const typeLabel = t ? (t.nameTh || t.name) : 'Template';
                 const typeIcon = t ? t.icon : 'auto_awesome';
-                const typeColor = t ? t.from : '#FF3366';
+                const typeColor = t ? t.from : '#E6C97A';
                 const fullUrl = `${window.location.origin}${window.location.pathname.replace('dashboard.html', '') || '/'}view.html?id=${s.id}`;
 
                 return `

@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เปิดเซอร์ไพรส์ | Zprise</title>
+    <title>เปิดเซอร์ไพรส์ | Surpo</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪄</text></svg>">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
@@ -52,7 +54,7 @@
             width: 40px;
             height: 40px;
             border: 2px solid rgba(255, 255, 255, 0.1);
-            border-top-color: white;
+            border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
@@ -207,10 +209,10 @@
             gap: 8px;
             padding: 10px 24px;
             border-radius: 50px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(230, 201, 122, 0.08);
+            border: 1px solid rgba(230, 201, 122, 0.3);
             font-size: 0.85rem;
-            color: var(--text-muted);
+            color: var(--accent);
             animation: pulseTap 2s ease-in-out infinite;
             cursor: pointer;
         }
@@ -407,7 +409,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Kanit', sans-serif;
         }
 
         .interact-btn:hover {
@@ -535,7 +537,7 @@
                     console.warn("Failed to update view count, proceeding anyway.", updateErr);
                 }
 
-                document.title = `เซอร์ไพรส์ถึง ${surpriseData.receiver} | Zprise`;
+                document.title = `เซอร์ไพรส์ถึง ${surpriseData.receiver} | Surpo`;
                 showIntro();
             } catch (err) {
                 console.error(err);
